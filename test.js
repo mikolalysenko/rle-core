@@ -1,3 +1,8 @@
-var runs = require('./src/rle_chunk.js').encode_potential([2,2,2], [1,1,1,1,1,1,1,1,1], [1,1,1,1,1,1,1,1,1,1,1]);
+var rle_encode = require('./src/rle_volume.js').encode;
 
-console.log(runs);
+console.log(rle_encode({
+      dims: [2,2,2]
+    , density_array: [1,1,1,1,1,1,1,1,1] 
+  }));
+
+
