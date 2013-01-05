@@ -6,11 +6,57 @@ var EPSILON           = 1e-6
   , POSITIVE_INFINITY =  (1<<30)
   , NEGATIVE_INFINITY = -(1<<30)
   , EDGE_TABLE        = new Array(256)  //List of 12-bit masks describing edge crossings
-  , CUBE_EDGES        = new Array(12);  //List of 12 edges of cube
+  , CUBE_EDGES        = new Array(12)   //List of 12 edges of cube
+  , MOORE_STENCIL     = [ [0,0,0] ]
+  , SURFACE_STENCIL   = [ ];
 
+//Run data structure
+var Run = new Function("coord", "value", [
+  "this.coord=coord;",
+  "this.value=value;"
+].join("\n"));
+
+//Compare two runs
+var run_compare = new Function("a", "b", [
+  "var ra=a.coord,rb=b.coord;",
+  "for(var i=2;i>=0;--i) {",
+    "var d=ra[i]-rb[i];",
+    "if(d){return d;}",
+  "}",
+  "return 0;",
+].join("\n"));
+
+//Compare two runs
+var lex_compare = new Function("ra", "rb", [
+  "for(var i=2;i>=0;--i) {",
+    "var d=ra[i]-rb[i];",
+    "if(d){return d;}",
+  "}",
+  "return 0;",
+].join("\n"));
 
 //Initialize CUBE_EDGES and EDGE_TABLE with precalculated values
 (function(){
+
+//Build surface stencil
+for(var i=0; i<8; ++i) {
+  var p = [0,0,0];
+  for(var j=0; j<3; ++j) {
+    if((i & (1<<j)) !== 0) {
+      p[j] = -1;
+    }
+  }
+  SURFACE_STENCIL.push(p);
+}
+
+//Build Moore stencil
+for(var i=0; i<3; ++i) {
+  for(var s=-1; s<=1; s+=2) {
+    var p = [0,0,0];
+    p[d] = s;
+    MOORE_STENCIL.push(p);
+  }
+}
 
 var n = 0;
 for(var i=0; i<8; ++i) {
@@ -38,105 +84,188 @@ for(var mask=0; mask<256; ++mask) {
 
 })();
 
-//Run data structure
-var Run = new Function("coord", "value", [
-  "this.coord = coord;",
-  "this.value = value;"
-].join("\n"));
-
-//Compare two runs
-var run_compare = new Function("a", "b", [
-  "var ra = a.coord, rb = b.coord;",
-  "for(var i=2; i>=0; --i) {",
-    "var d = ra[i] - rb[i];",
-    "if(d) { return d; }",
-  "}",
-  "return 0;",
-].join("\n"));
-
-
-//Compare two runs
-var lex_compare = new Function("ra", "rb", [
-  "for(var i=2; i>=0; --i) {",
-    "var d = ra[i] - rb[i];",
-    "if(d) { return d; }",
-  "}",
-  "return 0;",
-].join("\n"));
-
-//Surface iterator
-function SurfaceIterator(volume, ptrs, coord) {
-  this.volume   = volume;
-  this.ptrs     = ptrs;
-  this.coord    = coord;
+//Walk a stencil over a volume
+function StencilIterator(volume, stencil, ptrs, coord, values) {
+  this.volume     = volume;
+  this.stencil    = stencil;
+  this.ptrs       = ptrs;
+  this.coord      = coord;
+  this.values     = values;
 }
 
-//Clone surface iterator
-SurfaceIterator.prototype.clone = function() {
-  return new SurfaceIterator(
-    this.volume,
-    this.ptrs.slice(0),
-    this.coord.slice(0)
+//Make a copy of this iterator
+StencilIterator.prototype.clone = function() {
+  return new StencilIterator(
+      volume
+    , stencil
+    , ptrs.slice(0)
+    , coord.slice(0)
+    , values.slice(0)
+    , length
   );
 }
 
-//Check if iterator has a next element
-SurfaceIterator.prototype.hasNext = function() {
-  return this.ptrs[7] < this.volume.runs.length-1;
+//Retrieves length of current run
+StencilIterator.prototype.length = function() {
+  var len = POSITIVE_INFINITY
+    , runs = this.volume.runs;
+  for(var i=0; i<this.ptrs.length; ++i) {
+    if(this.ptrs[i] >= this.volume.runs.length - 1) {
+      continue;
+    };
+    var d = runs[this.ptrs[i]+1].coord[0] - runs[this.ptrs[i]].coord[0];
+    if(d > 0) {
+      len = Math.min(len, d);
+    }
+  }
+  return len;
+}
+
+//Checks if iterator has another value
+StencilIterator.prototype.hasNext = function() {
+  return this.coord[0] < POSITIVE_INFINITY;
 }
 
 //Advance iterator one position
-SurfaceIterator.prototype.next = function() {
-  var runs  = this.volume.runs
-    , ptrs  = this.ptrs
-    , coord = this.coord
-    , nc    = [0,0,0];
-  //Advance to infinity
+StencilIterator.prototype.next = function() {
+  var runs    = this.volume.runs
+    , stencil = this.stencil
+    , ptrs    = this.ptrs
+    , coord   = this.coord
+    , values  = this.values
+    , tcoord  = [0,0,0];
+  //Set iterator to infinity initially
   for(var i=0; i<3; ++i) {
     coord[i] = POSITIVE_INFINITY;
   }
-  //Compute coordinate for start of next surface point
-  for(var i=0; i<8; ++i) {
+  //Compute next coordinate
+  for(var i=0; i<stencil.length; ++i) {
     if(ptrs[i] >= runs.length-1) {
       continue;
     }
-    var nr = runs[ptrs[i]+1].coord;
+    var nr = runs[ptrs[i]+1].coord
+      , delta = stencil[i];
     for(var j=0; j<3; ++j) {
-      nc[j] = nr[j] + ((i&(1<<j)) ? 1 : 0);
+      tcoord[j] = nr[j] - delta[j];
     }
-    if(lex_compare(nc, coord) < 0) {
+    if(lex_compare(tcoord, coord) < 0) {
       for(var j=0; j<3; ++j) {
-        coord[j] = nc[j];
+        coord[j] = tcoord[j];
       }
     }
   }
-  //Update pointers
-  for(var i=0; i<8; ++i) {
-    if(ptrs[i] >= runs.length - 1) {
+  //Advance to next coordinate
+  for(var i=0; i<stencil.length; ++i) {
+    if(ptrs[i] >= runs.length-1) {
       continue;
     }
-    var nr = runs[ptrs[i]+1].coord;
+    var nr = runs[ptrs[i]+1].coord
+      , delta = stencil[i];
     for(var j=0; j<3; ++j) {
-      nc[j] = nr[j] + ((i&(1<<j)) ? 1 : 0);
+      tcoord[j] = nr[j] - delta[j];
     }
-    if(lex_compare(nc, coord) <= 0) {
+    //Update pointer
+    if(lex_compare(tcoord, coord) <= 0) {
       ++ptrs[i];
+      values[i] = runs[ptrs[i]].value;
     }
   }
-};
+}
 
+//Multivolume iterator
+function MultiIterator(volumes, stencil, ptrs, coord, values) {
+  this.volumes  = volumes;
+  this.stencil  = stencil;
+  this.ptrs     = ptrs;
+  this.coord    = coord;
+  this.values   = values;
+}
 
-//Computes the mask
-SurfaceIterator.prototype.mask = function() {
-  var mask = 0
-    , runs = this.volume.runs
-    , ptrs = this.ptrs;
-  for(var i=0; i<8; ++i) {
-    if(runs[ptrs[i]].value >= 0) {
-      mask |= 1<<i;
+MultiIterator.prototype.clone = function() {
+  return new MultiIterator(
+    this.volumes,
+    this.stencil,
+    this.ptrs.slice(0),
+    this.coord.slice(0),
+    this.values.slice(0)
+  );
+}
+
+MultiIterator.prototype.hasNext = function() {
+  return this.coord[0] < POSITIVE_INFINITY;
+}
+
+MultiIterator.prototype.next = function() {
+  var volumes = this.volumes
+    , stencil = this.stencil
+    , coord   = this.coord
+    , tcoord  = [0,0,0];
+  //Set iterator to infinity initially
+  for(var i=0; i<3; ++i) {
+    coord[i] = POSITIVE_INFINITY;
+  }
+  //Compute next coordinate
+  for(var i=0; i<stencil.length; ++i) {
+    var delta = stencil[i]
+      , ptrs  = this.ptrs[i];
+    for(var j=0; j<volumes.length; ++j) {
+      var runs = volumes[j].runs;
+      if(ptrs[j] >= runs.length-1) {
+        continue;
+      }
+      var x = runs[ptrs[j]+1].coord;
+      for(var k=0; k<3; ++k) {
+        tcoord[k] = x[k] - delta[k];
+      }
+      if(lex_compare(tcoord, coord) < 0) {
+        for(var k=0; k<3; ++k) {
+          coord[k] = tcoord[k];
+        }
+      }
     }
   }
-  return mask;
+  //Advance pointers
+  for(var i=0; i<stencil.length; ++i) {
+    var delta   = stencil[i]
+      , ptrs    = this.ptrs[i]
+      , values  = this.values[i];
+    
+    for(var j=0; j<volumes.length; ++j) {
+      var runs = volumes[j].runs;
+      if(ptrs[j] >= runs.length-1) {
+        continue;
+      }
+      var x = runs[ptrs[j]+1].coord;
+      for(var k=0; k<3; ++k) {
+        tcoord[k] = x[k] - delta[k];
+      }
+      if(lex_compare(tcoord, coord) <= 0) {
+        ++ptrs[j];
+        values[j] = runs[ptrs[j]].value;
+      }
+    }
+  }
+}
+
+//Perform a multiway iteration over a collection of volumes
+function multi_begin(volumes, stencil) {
+  var ptrs    = new Array(stencil.length)
+    , values  = new Array(stencil.length);
+  for(var i=0; i<ptrs.length; ++i) {
+    ptrs[i]     = new Array(volumes.length);
+    values[i]   = new Array(volumes.length);
+    for(var j=0; j<volumes.length; ++j) {
+      ptrs[i][j]    = 0;
+      values[i][j]  = volumes[j].runs[0].value;
+    }
+  }
+  return new MultiIterator(
+    volumes,
+    stencil,
+    ptrs,
+    [NEGATIVE_INFINITY,NEGATIVE_INFINITY,NEGATIVE_INFINITY],
+    values
+  );
 }
 
 //A binary volume
@@ -144,12 +273,21 @@ function BinaryVolume(runs, nfaces) {
   this.runs       = runs;
 };
 
-//Create a surface iterator
-BinaryVolume.prototype.begin = function() {
-  return new SurfaceIterator(
+//Create a stencil iterator
+BinaryVolume.prototype.stencil_begin = function(stencil) {
+  var ptrs = new Array(stencil.length)
+    , vals = new Array(stencil.length)
+    , v    = this.runs[0].value;
+  for(var i=0; i<stencil.length; ++i) {
+    ptrs[i] = 0;
+    vals[i] = 0;
+  }
+  return new StencilIterator(
     this,
-    [1,0,0,0,0,0,0,0],
-    this.runs[1].coord.slice(0)
+    stencil,
+    ptrs,
+    [NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY],
+    vals
   );
 }
 
@@ -192,15 +330,13 @@ BinaryVolume.prototype.surface = function() {
     , v_ptr     = [0,0,0,0,0,0,0,0]
     , nc        = [0,0,0]
     , nd        = [0,0,0];
-  
-  for(var iter=this.begin(); iter.hasNext(); iter.next()) {
+  for(var iter=this.stencil_begin(SURFACE_STENCIL); iter.hasNext(); iter.next()) {
     //Read in values and mask
     var ptrs = iter.ptrs
-      , mask = 0;
+      , mask = 0
+      , vals = iter.values;
     for(var i=0; i<8; ++i) {
-      var v = runs[ptrs[i]].value;
-      vals[i] = v;
-      mask   |= v < 0 ? 0 : (1 << i);
+      mask |= vals[i] < 0 ? 0 : (1 << i);
     }
     if(mask === 0 || mask === 0xff) {
       continue;
@@ -247,15 +383,14 @@ BinaryVolume.prototype.surface = function() {
       var iu = 1<<((i+1)%3)
         , iv = 1<<((i+2)%3);
       if(mask & 1) {
-        faces.push([v_ptr[0], v_ptr[iu], v_ptr[iv]]);
+        faces.push([v_ptr[0],  v_ptr[iu], v_ptr[iv]]);
         faces.push([v_ptr[iv], v_ptr[iu], v_ptr[iu+iv]]);
       } else {
-        faces.push([v_ptr[0], v_ptr[iv], v_ptr[iu]]);
+        faces.push([v_ptr[0],  v_ptr[iv], v_ptr[iu]]);
         faces.push([v_ptr[iu], v_ptr[iv], v_ptr[iu+iv]]);
       }
     }
   }
-  
   return {
     positions: positions,
     faces:     faces
@@ -296,11 +431,52 @@ outer_loop:
   return new BinaryVolume(runs);
 }
 
+//Performs a k-way merge on a collection of volumes
+function merge(volumes, merge_func) {
+  var merged_runs = [];
+  for(var iter = multi_begin(volumes, MOORE_STENCIL); iter.hasNext(); iter.next()) {
+    var rho   = merge_func(iter.values[0])
+      , sign  = rho < 0;
+    for(var i=1; i<6; ++i) {
+      var f = merge_func(iter.values[i]);
+      if(sign !== (f<0)) {
+        merged_runs.push(new Run(iter.coord.slice(0), rho));
+        break;
+      }
+    }
+  }
+  return new BinaryVolume(merged_runs);
+}
+
+//Dilates a volume by a stencil
+function dilate(volume, stencil) {
+}
+
+
+//Subtract a function
+var SUBTRACT_FUNC = new Function("a", "b", [
+  "return Math.min(a,-b);"
+].join("\n"));
 
 //Expose interface
-exports.sample     = sample;
-exports.CUBE_EDGES = CUBE_EDGES;
-exports.EDGE_TABLE = EDGE_TABLE;
+exports.Run           = Run;
+exports.BinaryVolume  = BinaryVolume;
+exports.multi_begin   = multi_begin;
+exports.sample        = sample;
+exports.merge         = merge;
+
+//Boolean set operations
+exports.union      = function(a, b) { return merge([a,b], Math.max); }
+exports.intersect  = function(a, b) { return merge([a,b], Math.min); }
+exports.subtract   = function(a, b) { return merge([a,b], SUBTRACT_FUNC); }
+exports.complement = function(a)    {
+  var nruns = new Array(a.runs.length);
+  for(var i=0; i<nruns.length; ++i) {
+    var r = a.runs[i];
+    nruns[i] = new Run(r.coord.slice(0), r.value);
+  }
+  return new BinaryVolume(nruns);
+};
 
 //Create empty volume
 Object.defineProperty(exports, "EMPTY_VOLUME", {
