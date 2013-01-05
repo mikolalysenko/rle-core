@@ -1,14 +1,23 @@
 "use strict"; "use restrict";
 
-var DisjointSet = require("./disjoint_set.js").DisjointSet;
+var misc = require("./misc.js")
+  , iterators = require("./iterators.js")
+  , DisjointSet = require("./disjoint_set.js").DisjointSet;
 
-var EPSILON           = 1e-6
-  , POSITIVE_INFINITY =  (1<<30)
-  , NEGATIVE_INFINITY = -(1<<30)
-  , EDGE_TABLE        = new Array(256)  //List of 12-bit masks describing edge crossings
-  , CUBE_EDGES        = new Array(12)   //List of 12 edges of cube
-  , MOORE_STENCIL     = [ [0,0,0] ]
-  , SURFACE_STENCIL   = [ ];
+//Import globals
+var lex_compare       = misc.lex_compare
+  , EPSILON           = misc.EPSILON
+  , POSITIVE_INFINITY = misc.POSITIVE_INFINITY
+  , NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY
+  , EDGE_TABLE        = misc.EDGE_TABLE
+  , CUBE_EDGES        = misc.CUBE_EDGES
+  , MOORE_STENCIL     = misc.MOORE_STENCIL
+  , SURFACE_STENCIL   = misc.SURFACE_STENCIL;
+
+//Import iterators
+var stencil_begin     = iterators.stencil_begin
+  , multi_begin       = iterators.multi_begin;
+
 
 //Run data structure
 var Run = new Function("coord", "value", [
@@ -26,248 +35,6 @@ var run_compare = new Function("a", "b", [
   "return 0;",
 ].join("\n"));
 
-//Compare two runs
-var lex_compare = new Function("ra", "rb", [
-  "for(var i=2;i>=0;--i) {",
-    "var d=ra[i]-rb[i];",
-    "if(d){return d;}",
-  "}",
-  "return 0;",
-].join("\n"));
-
-//Initialize CUBE_EDGES and EDGE_TABLE with precalculated values
-(function(){
-
-//Build surface stencil
-for(var i=0; i<8; ++i) {
-  var p = [0,0,0];
-  for(var j=0; j<3; ++j) {
-    if((i & (1<<j)) !== 0) {
-      p[j] = -1;
-    }
-  }
-  SURFACE_STENCIL.push(p);
-}
-
-//Build Moore stencil
-for(var i=0; i<3; ++i) {
-  for(var s=-1; s<=1; s+=2) {
-    var p = [0,0,0];
-    p[d] = s;
-    MOORE_STENCIL.push(p);
-  }
-}
-
-var n = 0;
-for(var i=0; i<8; ++i) {
-  for(var d=0; d<3; ++d) {
-    var j = i ^ (1<<d);
-    if(j < i) {
-      continue;
-    }
-    CUBE_EDGES[n] = [i, j, d];
-    ++n;
-  }
-}
-
-//Precalculate edge crossings
-for(var mask=0; mask<256; ++mask) {
-  var e_mask = 0;
-  for(var i=0; i<12; ++i) {
-    var e = CUBE_EDGES[i];
-    if(!(mask & (1<<e[0])) !== !(mask & (1<<e[1]))) {
-      e_mask |= (1<<i);
-    }
-    EDGE_TABLE[mask] = e_mask;
-  }
-}
-
-})();
-
-//Walk a stencil over a volume
-function StencilIterator(volume, stencil, ptrs, coord, values) {
-  this.volume     = volume;
-  this.stencil    = stencil;
-  this.ptrs       = ptrs;
-  this.coord      = coord;
-  this.values     = values;
-}
-
-//Make a copy of this iterator
-StencilIterator.prototype.clone = function() {
-  return new StencilIterator(
-      volume
-    , stencil
-    , ptrs.slice(0)
-    , coord.slice(0)
-    , values.slice(0)
-    , length
-  );
-}
-
-//Retrieves length of current run
-StencilIterator.prototype.length = function() {
-  var len = POSITIVE_INFINITY
-    , runs = this.volume.runs;
-  for(var i=0; i<this.ptrs.length; ++i) {
-    if(this.ptrs[i] >= this.volume.runs.length - 1) {
-      continue;
-    };
-    var d = runs[this.ptrs[i]+1].coord[0] - runs[this.ptrs[i]].coord[0];
-    if(d > 0) {
-      len = Math.min(len, d);
-    }
-  }
-  return len;
-}
-
-//Checks if iterator has another value
-StencilIterator.prototype.hasNext = function() {
-  return this.coord[0] < POSITIVE_INFINITY;
-}
-
-//Advance iterator one position
-StencilIterator.prototype.next = function() {
-  var runs    = this.volume.runs
-    , stencil = this.stencil
-    , ptrs    = this.ptrs
-    , coord   = this.coord
-    , values  = this.values
-    , tcoord  = [0,0,0];
-  //Set iterator to infinity initially
-  for(var i=0; i<3; ++i) {
-    coord[i] = POSITIVE_INFINITY;
-  }
-  //Compute next coordinate
-  for(var i=0; i<stencil.length; ++i) {
-    if(ptrs[i] >= runs.length-1) {
-      continue;
-    }
-    var nr = runs[ptrs[i]+1].coord
-      , delta = stencil[i];
-    for(var j=0; j<3; ++j) {
-      tcoord[j] = nr[j] - delta[j];
-    }
-    if(lex_compare(tcoord, coord) < 0) {
-      for(var j=0; j<3; ++j) {
-        coord[j] = tcoord[j];
-      }
-    }
-  }
-  //Advance to next coordinate
-  for(var i=0; i<stencil.length; ++i) {
-    if(ptrs[i] >= runs.length-1) {
-      continue;
-    }
-    var nr = runs[ptrs[i]+1].coord
-      , delta = stencil[i];
-    for(var j=0; j<3; ++j) {
-      tcoord[j] = nr[j] - delta[j];
-    }
-    //Update pointer
-    if(lex_compare(tcoord, coord) <= 0) {
-      ++ptrs[i];
-      values[i] = runs[ptrs[i]].value;
-    }
-  }
-}
-
-//Multivolume iterator
-function MultiIterator(volumes, stencil, ptrs, coord, values) {
-  this.volumes  = volumes;
-  this.stencil  = stencil;
-  this.ptrs     = ptrs;
-  this.coord    = coord;
-  this.values   = values;
-}
-
-MultiIterator.prototype.clone = function() {
-  return new MultiIterator(
-    this.volumes,
-    this.stencil,
-    this.ptrs.slice(0),
-    this.coord.slice(0),
-    this.values.slice(0)
-  );
-}
-
-MultiIterator.prototype.hasNext = function() {
-  return this.coord[0] < POSITIVE_INFINITY;
-}
-
-MultiIterator.prototype.next = function() {
-  var volumes = this.volumes
-    , stencil = this.stencil
-    , coord   = this.coord
-    , tcoord  = [0,0,0];
-  //Set iterator to infinity initially
-  for(var i=0; i<3; ++i) {
-    coord[i] = POSITIVE_INFINITY;
-  }
-  //Compute next coordinate
-  for(var i=0; i<stencil.length; ++i) {
-    var delta = stencil[i]
-      , ptrs  = this.ptrs[i];
-    for(var j=0; j<volumes.length; ++j) {
-      var runs = volumes[j].runs;
-      if(ptrs[j] >= runs.length-1) {
-        continue;
-      }
-      var x = runs[ptrs[j]+1].coord;
-      for(var k=0; k<3; ++k) {
-        tcoord[k] = x[k] - delta[k];
-      }
-      if(lex_compare(tcoord, coord) < 0) {
-        for(var k=0; k<3; ++k) {
-          coord[k] = tcoord[k];
-        }
-      }
-    }
-  }
-  //Advance pointers
-  for(var i=0; i<stencil.length; ++i) {
-    var delta   = stencil[i]
-      , ptrs    = this.ptrs[i]
-      , values  = this.values[i];
-    
-    for(var j=0; j<volumes.length; ++j) {
-      var runs = volumes[j].runs;
-      if(ptrs[j] >= runs.length-1) {
-        continue;
-      }
-      var x = runs[ptrs[j]+1].coord;
-      for(var k=0; k<3; ++k) {
-        tcoord[k] = x[k] - delta[k];
-      }
-      if(lex_compare(tcoord, coord) <= 0) {
-        ++ptrs[j];
-        values[j] = runs[ptrs[j]].value;
-      }
-    }
-  }
-}
-
-//Perform a multiway iteration over a collection of volumes
-function multi_begin(volumes, stencil) {
-  var ptrs    = new Array(stencil.length)
-    , values  = new Array(stencil.length);
-  for(var i=0; i<ptrs.length; ++i) {
-    ptrs[i]     = new Array(volumes.length);
-    values[i]   = new Array(volumes.length);
-    for(var j=0; j<volumes.length; ++j) {
-      ptrs[i][j]    = 0;
-      values[i][j]  = volumes[j].runs[0].value;
-    }
-  }
-  return new MultiIterator(
-    volumes,
-    stencil,
-    ptrs,
-    [NEGATIVE_INFINITY,NEGATIVE_INFINITY,NEGATIVE_INFINITY],
-    values
-  );
-}
-
 //A binary volume
 function BinaryVolume(runs, nfaces) {
   this.runs       = runs;
@@ -275,22 +42,8 @@ function BinaryVolume(runs, nfaces) {
 
 //Create a stencil iterator
 BinaryVolume.prototype.stencil_begin = function(stencil) {
-  var ptrs = new Array(stencil.length)
-    , vals = new Array(stencil.length)
-    , v    = this.runs[0].value;
-  for(var i=0; i<stencil.length; ++i) {
-    ptrs[i] = 0;
-    vals[i] = 0;
-  }
-  return new StencilIterator(
-    this,
-    stencil,
-    ptrs,
-    [NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY],
-    vals
-  );
+  return stencil_begin(this, stencil);
 }
-
 
 //Make a copy of a volume
 BinaryVolume.prototype.clone = function() {
@@ -303,24 +56,6 @@ BinaryVolume.prototype.clone = function() {
   return new BinaryVolume(nruns);
 }
 
-//Find the run containing a particular coordinate in the volume
-BinaryVolume.prototype.bisect = function(lo, hi, coord) {
-  var runs = this.runs;
-  while (lo < hi) {
-    var mid = (lo + hi) >> 1
-      , s = lex_compare(runs[mid].coord, coord);
-    if(s > 0) {
-      lo = mid + 1;
-    } else if(s < 0) {
-      hi = mid - 1;
-    } else {
-      return mid;
-    }
-  }
-  return lo;
-}
-
-
 //Extracts a surface from the volume using elastic surface nets
 BinaryVolume.prototype.surface = function() {
   var positions = []
@@ -330,13 +65,14 @@ BinaryVolume.prototype.surface = function() {
     , v_ptr     = [0,0,0,0,0,0,0,0]
     , nc        = [0,0,0]
     , nd        = [0,0,0];
-  for(var iter=this.stencil_begin(SURFACE_STENCIL); iter.hasNext(); iter.next()) {
+  for(var iter=stencil_begin(this, SURFACE_STENCIL); iter.hasNext(); iter.next()) {
     //Read in values and mask
     var ptrs = iter.ptrs
-      , mask = 0
-      , vals = iter.values;
+      , mask = 0;
     for(var i=0; i<8; ++i) {
-      mask |= vals[i] < 0 ? 0 : (1 << i);
+      var v = runs[ptrs[i]].value;
+      vals[i] = v;
+      mask |= v < 0 ? 0 : (1 << i);
     }
     if(mask === 0 || mask === 0xff) {
       continue;
@@ -433,12 +169,20 @@ outer_loop:
 
 //Performs a k-way merge on a collection of volumes
 function merge(volumes, merge_func) {
-  var merged_runs = [];
+  var merged_runs = []
+    , values      = new Array(volumes.length);
   for(var iter = multi_begin(volumes, MOORE_STENCIL); iter.hasNext(); iter.next()) {
-    var rho   = merge_func(iter.values[0])
+  
+    for(var i=0; i<values.length; ++i) {
+      values[i] = volumes[i].runs[iter.ptrs[i][0]].value;
+    }
+    var rho   = merge_func(values)
       , sign  = rho < 0;
     for(var i=1; i<6; ++i) {
-      var f = merge_func(iter.values[i]);
+      for(var j=0; j<values.length; ++j) {
+        values[j] = volumes[j].runs[iter.ptrs[j][i]].value;
+      }
+      var f = merge_func(values[i]);
       if(sign !== (f<0)) {
         merged_runs.push(new Run(iter.coord.slice(0), rho));
         break;
@@ -448,26 +192,30 @@ function merge(volumes, merge_func) {
   return new BinaryVolume(merged_runs);
 }
 
-//Dilates a volume by a stencil
+//Dilate by a stencil
 function dilate(volume, stencil) {
+
+  for(var iter=stencil_begin(volume, stencil); iter.hasNext(); iter.next()) {
+  
+  }
 }
 
 
+
 //Subtract a function
-var SUBTRACT_FUNC = new Function("a", "b", [
-  "return Math.min(a,-b);"
-].join("\n"));
+var SUBTRACT_FUNC   = new Function("a", "return Math.min(a[0],-a[1]);" )
+  , INTERSECT_FUNC  = new Function("a", "return Math.min(a[0], a[1]);" )
+  , UNION_FUNC      = new Function("a", "return Math.max(a[0], a[1]);" )
 
 //Expose interface
-exports.Run           = Run;
+exports.BinaryRun     = Run;
 exports.BinaryVolume  = BinaryVolume;
-exports.multi_begin   = multi_begin;
 exports.sample        = sample;
 exports.merge         = merge;
 
 //Boolean set operations
-exports.union      = function(a, b) { return merge([a,b], Math.max); }
-exports.intersect  = function(a, b) { return merge([a,b], Math.min); }
+exports.union      = function(a, b) { return merge([a,b], UNION_FUNC); }
+exports.intersect  = function(a, b) { return merge([a,b], INTERSECT_FUNC); }
 exports.subtract   = function(a, b) { return merge([a,b], SUBTRACT_FUNC); }
 exports.complement = function(a)    {
   var nruns = new Array(a.runs.length);
@@ -477,6 +225,7 @@ exports.complement = function(a)    {
   }
   return new BinaryVolume(nruns);
 };
+
 
 //Create empty volume
 Object.defineProperty(exports, "EMPTY_VOLUME", {
