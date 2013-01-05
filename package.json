@@ -1,23 +1,22 @@
 {
   "name": "rle-voxels",
   "version": "0.0.0",
-  "description": "Run length encoded volumes in Javascript",
+  "description": "A library for working with run length encoded voxel data",
   "main": "src/index.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
-    "url": "git://github.com/mikolalysenko/VoxelsJS.git"
+    "url": "git://github.com/mikolalysenko/rle-voxels.git"
   },
   "keywords": [
-    "voxels"
+    "voxels",
+    "rle",
+    "surface",
+    "webgl",
+    "solid",
+    "cad"
   ],
   "author": "Mikola Lysenko",
   "license": "MIT",
   "readmeFilename": "README.md",
-  "gitHead": "531278500246e59e6daec8c87646baba0500acf0"
+  "gitHead": "f4b1cf2c8b27462c783e2bfa30a3b4ad63a637fa"
 }
