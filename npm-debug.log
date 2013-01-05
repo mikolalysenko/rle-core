@@ -1,0 +1,111 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/opt/local/bin/node', '/opt/local/bin/npm', 'publish' ]
+2 info using npm@1.1.70
+3 info using node@v0.8.16
+4 verbose publish [ '.' ]
+5 verbose read json /Users/mikolalysenko/GitHub/VoxelsJS/package.json
+6 verbose cache add [ '.', null ]
+7 silly cache add name=undefined spec="." args=[".",null]
+8 verbose parsed url { pathname: '.', path: '.', href: '.' }
+9 silly lockFile 3a52ce78- .
+10 verbose lock . /Users/mikolalysenko/.npm/3a52ce78-.lock
+11 verbose read json package.json
+12 verbose tar pack [ '/var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/tmp.tgz',
+12 verbose tar pack   '.' ]
+13 verbose tarball /var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/tmp.tgz
+14 verbose folder .
+15 info prepublish VoxelsJS@0.0.0
+16 silly lockFile 5bde3047-3738-0-06292987801134586-tmp-tgz /var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/tmp.tgz
+17 verbose lock /var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/tmp.tgz /Users/mikolalysenko/.npm/5bde3047-3738-0-06292987801134586-tmp-tgz.lock
+18 silly lockFile 5bde3047-3738-0-06292987801134586-tmp-tgz /var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/tmp.tgz
+19 verbose tar unpack /var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/tmp.tgz
+20 silly lockFile 3541194d-3738-0-06292987801134586-package /var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/package
+21 verbose lock /var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/package /Users/mikolalysenko/.npm/3541194d-3738-0-06292987801134586-package.lock
+22 silly gunzTarPerm modes [ '755', '644' ]
+23 silly gunzTarPerm extractEntry package.json
+24 silly gunzTarPerm extractEntry README.md
+25 silly gunzTarPerm extractEntry src/binary_volume.js
+26 silly gunzTarPerm extractEntry src/disjoint_set.js
+27 silly gunzTarPerm extractEntry src/index.js
+28 silly gunzTarPerm extractEntry src/misc.js
+29 silly gunzTarPerm extractEntry src/multi_iterator.js
+30 silly gunzTarPerm extractEntry src/stencil_iterator.js
+31 verbose read json /var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/package/package.json
+32 silly lockFile 3541194d-3738-0-06292987801134586-package /var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/package
+33 verbose from cache /var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/package/package.json
+34 verbose tar pack [ '/Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package.tgz',
+34 verbose tar pack   '/var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/package' ]
+35 verbose tarball /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package.tgz
+36 verbose folder /var/folders/zw/gbr5ndq52q527y2bn2n6h5rr0000gn/T/npm-31824/1357424593738-0.06292987801134586/package
+37 silly lockFile 1e27f48d-o-npm-VoxelsJS-0-0-0-package-tgz /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package.tgz
+38 verbose lock /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package.tgz /Users/mikolalysenko/.npm/1e27f48d-o-npm-VoxelsJS-0-0-0-package-tgz.lock
+39 silly lockFile 1e27f48d-o-npm-VoxelsJS-0-0-0-package-tgz /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package.tgz
+40 silly lockFile 805a0a47-senko-npm-VoxelsJS-0-0-0-package /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package
+41 verbose lock /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package /Users/mikolalysenko/.npm/805a0a47-senko-npm-VoxelsJS-0-0-0-package.lock
+42 silly lockFile 805a0a47-senko-npm-VoxelsJS-0-0-0-package /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package
+43 verbose tar unpack /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package.tgz
+44 silly lockFile 805a0a47-senko-npm-VoxelsJS-0-0-0-package /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package
+45 verbose lock /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package /Users/mikolalysenko/.npm/805a0a47-senko-npm-VoxelsJS-0-0-0-package.lock
+46 silly gunzTarPerm modes [ '755', '644' ]
+47 silly gunzTarPerm extractEntry package.json
+48 silly gunzTarPerm extractEntry README.md
+49 silly gunzTarPerm extractEntry src/binary_volume.js
+50 silly gunzTarPerm extractEntry src/disjoint_set.js
+51 silly gunzTarPerm extractEntry src/index.js
+52 silly gunzTarPerm extractEntry src/misc.js
+53 silly gunzTarPerm extractEntry src/multi_iterator.js
+54 silly gunzTarPerm extractEntry src/stencil_iterator.js
+55 verbose read json /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package/package.json
+56 silly lockFile 805a0a47-senko-npm-VoxelsJS-0-0-0-package /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package
+57 silly shasum updated bytes 5081
+58 info shasum 6cca2cd942a9d8d03a5d4882fbaeb1426ab9cd65
+58 info shasum /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package.tgz
+59 verbose from cache /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package/package.json
+60 verbose chmod /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package.tgz 644
+61 verbose chown /Users/mikolalysenko/.npm/VoxelsJS/0.0.0/package.tgz [ 501, 20 ]
+62 silly lockFile 3a52ce78- .
+63 silly publish { name: 'VoxelsJS',
+63 silly publish   version: '0.0.0',
+63 silly publish   description: 'Run length encoded volumes in Javascript',
+63 silly publish   main: 'src/index.js',
+63 silly publish   directories: { test: 'test' },
+63 silly publish   scripts: { test: 'echo "Error: no test specified" && exit 1' },
+63 silly publish   repository:
+63 silly publish    { type: 'git',
+63 silly publish      url: 'git://github.com/mikolalysenko/VoxelsJS.git' },
+63 silly publish   keywords: [ 'voxels' ],
+63 silly publish   author: { name: 'Mikola Lysenko' },
+63 silly publish   license: 'MIT',
+63 silly publish   readmeFilename: 'README.md',
+63 silly publish   gitHead: '531278500246e59e6daec8c87646baba0500acf0',
+63 silly publish   readme: 'Voxels.JS\n=========\n\n...is a library for working with run-length encoded volume data in Javascript.  To install it, you just use npm',
+63 silly publish   _id: 'VoxelsJS@0.0.0',
+63 silly publish   dist: { shasum: '6cca2cd942a9d8d03a5d4882fbaeb1426ab9cd65' } }
+64 verbose url raw VoxelsJS
+65 verbose url resolving [ 'https://registry.npmjs.org/', './VoxelsJS' ]
+66 verbose url resolved https://registry.npmjs.org/VoxelsJS
+67 info trying registry request attempt 1 at 17:23:15
+68 http PUT https://registry.npmjs.org/VoxelsJS
+69 http 403 https://registry.npmjs.org/VoxelsJS
+70 error publish Failed PUT response 403
+71 error Error: forbidden New packages must have all-lowercase names: VoxelsJS
+71 error     at RegClient.<anonymous> (/opt/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:259:14)
+71 error     at Request.init.self.callback (/opt/local/lib/node_modules/npm/node_modules/request/main.js:120:22)
+71 error     at Request.EventEmitter.emit (events.js:99:17)
+71 error     at Request.<anonymous> (/opt/local/lib/node_modules/npm/node_modules/request/main.js:648:16)
+71 error     at Request.EventEmitter.emit (events.js:126:20)
+71 error     at IncomingMessage.Request.start.self.req.self.httpModule.request.buffer (/opt/local/lib/node_modules/npm/node_modules/request/main.js:610:14)
+71 error     at IncomingMessage.EventEmitter.emit (events.js:126:20)
+71 error     at IncomingMessage._emitEnd (http.js:366:10)
+71 error     at HTTPParser.parserOnMessageComplete [as onMessageComplete] (http.js:149:23)
+71 error     at CleartextStream.socketOnData [as ondata] (http.js:1367:20)
+72 error If you need help, you may report this log at:
+72 error     <http://github.com/isaacs/npm/issues>
+72 error or email it to:
+72 error     <npm-@googlegroups.com>
+73 error System Darwin 12.2.1
+74 error command "/opt/local/bin/node" "/opt/local/bin/npm" "publish"
+75 error cwd /Users/mikolalysenko/GitHub/VoxelsJS
+76 error node -v v0.8.16
+77 error npm -v 1.1.70
+78 verbose exit [ 1, true ]

@@ -18,7 +18,6 @@ var lex_compare       = misc.lex_compare
 var stencil_begin     = iterators.stencil_begin
   , multi_begin       = iterators.multi_begin;
 
-
 //Run data structure
 var Run = new Function("coord", "value", [
   "this.coord=coord;",
@@ -56,6 +55,94 @@ BinaryVolume.prototype.clone = function() {
   return new BinaryVolume(nruns);
 }
 
+//Extracts all connected components of the volume
+BinaryVolume.prototype.label_components = function() {
+  //First assign labels
+  var forest = new DisjointSet(this.runs.length)
+    , runs   = this.runs;
+  for(var iter=this.stencil_begin(SURFACE_STENCIL); iter.hasNext(); iter.next()) {
+    if(runs[iter.ptrs[0]].value < 0) {
+      continue;
+    }
+    for(var i=1; i<8; ++i) {
+      if(runs[iter.ptrs[i]].value < 0) {
+        continue;
+      }
+      forest.link(iter.ptrs[0], iter.ptrs[i]);
+    }
+  }
+  //Then mark components using labels
+  //HACK: Reuse rank array for labels
+  var clabels          = forest.ranks
+    , root2label       = []
+    , component_count  = 0;
+  for(var i=0; i<runs.length(); ++i) {
+    var run = runs[i];
+    if(run.value < 0) {
+      clabels[i] = -1;
+      continue;
+    }
+    var root = forest.find(i);
+    if(root in root2label) {
+      clabels[i] = root2label[root];
+    } else {
+      root2label[root] = component_count;
+      clabels[i] = component_count;
+      component_count++;
+    }
+  }
+  return {
+      count: component_count
+    , labels: clabels
+  }
+}
+
+//Extracts all components.  label_struct is the result of running label_components
+// and is reused if possible
+BinaryVolume.prototype.split_components = function(label_struct) {
+  if(!label_struct) {
+    label_struct = this.label_components;
+  }
+  var count       = label_struct.count
+    , labels      = label_struct.clabels
+    , components  = new Array(count);
+  for(var i=0; i<count; ++i) {
+    components[i] = [ ];
+  }
+  var runs = this.runs;
+  for(var iter=this.stencil_begin(MOORE_STENCIL); iter.hasNext(); iter.next()) {
+    var ptrs    = iter.ptrs
+      , center  = runs[ptrs[0]];
+    if(center.value < 0) {
+      //Check each neighbor
+      for(var i=1; i<7; ++i) {
+        var neighbor = runs[ptrs[i]];
+        if(neighbor.value < 0) {
+          continue;
+        }
+        var id = labels[ptrs[i]]
+          , cc = components[id];
+        if(lex_compare(cc[cc.length-1].coord, center.coord) < 0) {
+          cc.push(new Run(center.coord.slice(0), center.value));
+        }
+      }
+    } else {
+      var id = labels[ptrs[0]]
+        , cc = components[id];
+      if(lex_compare(cc[cc.length-1].coord, center.coord) < 0) {
+        cc.push(new Run(center.coord.slice(0), center.value));
+      }
+    }
+  }
+  
+  //Convert components back into volumes
+  var volumes = new Array(count);
+  for(var i=0; i<count; ++i) {
+    volumes[i] = new BinaryVolume(components[i]);
+  }
+  return volumes;
+}
+
 //Extracts a surface from the volume using elastic surface nets
 BinaryVolume.prototype.surface = function() {
   var positions = []
@@ -65,7 +152,7 @@ BinaryVolume.prototype.surface = function() {
     , v_ptr     = [0,0,0,0,0,0,0,0]
     , nc        = [0,0,0]
     , nd        = [0,0,0];
-  for(var iter=stencil_begin(this, SURFACE_STENCIL); iter.hasNext(); iter.next()) {
+  for(var iter=this.stencil_begin(SURFACE_STENCIL); iter.hasNext(); iter.next()) {
     //Read in values and mask
     var ptrs = iter.ptrs
       , mask = 0;
@@ -192,16 +279,6 @@ function merge(volumes, merge_func) {
   return new BinaryVolume(merged_runs);
 }
 
-//Dilate by a stencil
-function dilate(volume, stencil) {
-
-  for(var iter=stencil_begin(volume, stencil); iter.hasNext(); iter.next()) {
-  
-  }
-}
-
-
-
 //Subtract a function
 var SUBTRACT_FUNC   = new Function("a", "return Math.min(a[0],-a[1]);" )
   , INTERSECT_FUNC  = new Function("a", "return Math.min(a[0], a[1]);" )
@@ -225,7 +302,6 @@ exports.complement = function(a)    {
   }
   return new BinaryVolume(nruns);
 };
-
 
 //Create empty volume
 Object.defineProperty(exports, "EMPTY_VOLUME", {

@@ -1,4 +1,0 @@
-function llsq(A, b) {
-
-
-}

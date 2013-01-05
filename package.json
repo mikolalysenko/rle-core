@@ -1,0 +1,23 @@
+{
+  "name": "rle-voxels",
+  "version": "0.0.0",
+  "description": "Run length encoded volumes in Javascript",
+  "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikolalysenko/VoxelsJS.git"
+  },
+  "keywords": [
+    "voxels"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "531278500246e59e6daec8c87646baba0500acf0"
+}
