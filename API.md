@@ -5,7 +5,7 @@ The library is split into several submodules which provide various features.  Th
 
 Here is a highlevel breakdown of the APIs:
 
-* [rle][rle]
+* [rle](rle)
   * [rle.iterators]
     * [createStencil]
     * [StencilIterator]
