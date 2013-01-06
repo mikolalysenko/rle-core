@@ -4,10 +4,11 @@ var EPSILON           = 1e-6
   , EDGE_TABLE        = new Array(256)  //List of 12-bit masks describing edge crossings
   , CUBE_EDGES        = new Array(12)   //List of 12 edges of cube
   , MOORE_STENCIL     = [ [0,0,0] ]
-  , SURFACE_STENCIL   = [ ];
+  , SURFACE_STENCIL   = [ ]
+  , VON_NEUMANN_STENCIL
 
 //Compare two runs
-var lex_compare = new Function("ra", "rb", [
+var compareCoord = new Function("ra", "rb", [
   "for(var i=2;i>=0;--i) {",
     "var d=ra[i]-rb[i];",
     "if(d){return d;}",
@@ -34,6 +35,13 @@ for(var i=0; i<3; ++i) {
     p[d] = s;
     MOORE_STENCIL.push(p);
   }
+}
+
+//Von Neumann stencil
+for(var dz=-1; dz<=1; ++dz)
+for(var dy=-1; dy<=1; ++dy)
+for(var dx=-1; dx<=1; ++dx) {
+  VON_NEUMANN_STENCIL.push([dx,dy,dz]);
 }
 
 var n = 0;
@@ -64,7 +72,7 @@ for(var mask=0; mask<256; ++mask) {
 function bisect(runs, lo, hi, coord) {
   while (lo < hi) {
     var mid = (lo + hi) >> 1
-      , s = lex_compare(runs[mid].coord, coord);
+      , s = compareCoord(runs[mid].coord, coord);
     if(s > 0) {
       lo = mid + 1;
     } else if(s < 0) {
@@ -76,7 +84,7 @@ function bisect(runs, lo, hi, coord) {
   return lo;
 }
 
-exports.lex_compare       = lex_compare;
+exports.compareCoord      = compareCoord;
 exports.bisect            = bisect;
 exports.EPSILON           = EPSILON;
 exports.POSITIVE_INFINITY = POSITIVE_INFINITY;
@@ -85,3 +93,4 @@ exports.EDGE_TABLE        = EDGE_TABLE;
 exports.CUBE_EDGES        = CUBE_EDGES;
 exports.MOORE_STENCIL     = MOORE_STENCIL;
 exports.SURFACE_STENCIL   = SURFACE_STENCIL;
+exports.VON_NEUMANN_STENCIL = VON_NEUMANN_STENCIL;

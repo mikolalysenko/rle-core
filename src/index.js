@@ -1,11 +1,14 @@
+//General stuff
 var misc = require("./misc.js");
 exports.POSITIVE_INFINITY = misc.POSITIVE_INFINITY;
 exports.NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
+exports.compareCoord      = misc.compareCoord;
 
 //Stencils
 exports.stencils = {
-    MOORE:      misc.MOORE_STENCIL
-  , SURFACE:    misc.SURFACE_STENCIL
+    MOORE:        misc.MOORE_STENCIL
+  , SURFACE:      misc.SURFACE_STENCIL
+  , VON_NEUMANN:  misc.VON_NEUMANN_STENCIL
 };
 
 //Iterators
@@ -13,9 +16,9 @@ var stencil   = require("./stencil_iterator.js")
   , multi     = require("./multi_iterator.js");
 exports.iterators = {
     StencilIterator:    stencil.StencilIterator
-  , stencil_begin:      stencil.stencil_begin
+  , createStencil:      stencil.createStencil
   , MultiIterator:      multi.MultiIterator
-  , multi_begin:        multi.multi_begin
+  , createMultiStencil: multi.createMultiStencil
 };
 
 //Binary volumes
