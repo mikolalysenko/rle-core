@@ -1,33 +1,9 @@
-`rle-voxels` API
-===
-
-The library is split into several submodules which provide various features.  These are stored in various subobjects below the main library.  There are also some commonly used functions which are stored in the root namespace of the library.
-
-Here is a highlevel breakdown of the APIs:
-
-* [rle]
-  * [rle.iterators]
-    * [createStencil]
-    * [StencilIterator]
-    * [createMultiStencil]
-    * [MultiIterator]
-  * [rle.stencils]
-    * [SURFACE]
-    * [MOORE]
-    * [VON_NEUMANN]
-  * [rle.binary]
-    * [BinaryRun]
-    * [BinaryVolume]
-    * [EMPTY_VOLUME]
-    * [sample]
-    * [merge]
-    * [union]
-    * [intersect]
-    * [complement]
-    * [dilate]
-    * [erode]
+* auto-gen TOC:
+{:toc}
 
 # rle #
+
+The library is split into several submodules which provide various features.  These are stored in various subobjects below the main library.  There are also some commonly used functions which are stored in the root namespace of the library.
 
 The root namespace for library.  Contains constants and common methods for operating on runs.
 
