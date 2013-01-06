@@ -43,14 +43,13 @@ rle-voxels does not support in place updates of volumes.  The reason for this is
 Documentation
 =============
 
-Here are some useful references:
+Here are some resources which explain how to use this library:
 
-* [API Reference](API.md)
+* [API Reference]https://github.com/mikolalysenko/rle-voxels/blob/master/API.md)
 * Test cases
 * Interactive WebGL demo
 * Blog post on internals of rle-voxels
 
-
 Acknowledgements
 ================
-(c) Mikola Lysenko 2012-2013.  MIT License.
+(c) 2012-2013 Mikola Lysenko (mikolalysenko@gmail.com).  MIT License.

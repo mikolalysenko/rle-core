@@ -4,7 +4,6 @@ The library is split into several submodules which provide various features.  Th
 
 # `rle` #
 
-
 The root namespace for library.  Contains constants and common methods for operating on runs.
 
 ### `POSITIVE_INFINITY`
@@ -98,8 +97,7 @@ A multi volume stencil iterator.
 #### `MultiIterator.seek(coord)`
 
 
-`rle.stencils`
-==========
+# `rle.stencils` #
 
 Some useful templates for iterating over volumes.
 
@@ -144,8 +142,8 @@ A 3x3x3 cube centered at [0,0,0]:
     }
 
 
-`rle.binary`
-------------
+# `rle.binary` #
+
 This module contains code and utilities for working on 3D solid objects.
 
 
