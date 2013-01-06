@@ -1,9 +1,9 @@
-* auto-gen TOC:
-{:toc}
-
-# rle #
+# API Overview #
 
 The library is split into several submodules which provide various features.  These are stored in various subobjects below the main library.  There are also some commonly used functions which are stored in the root namespace of the library.
+
+# `rle` #
+
 
 The root namespace for library.  Contains constants and common methods for operating on runs.
 
@@ -41,8 +41,6 @@ Creates a stencil iterator for iterating over a run length encoded volume with t
 ### `createMultiStencil(volumes, stencil)`
 
 Creates a multi volume stencil iterator that walks over multiple volumes simultaneously.
-
-
 
 ## `StencilIterator`
 
