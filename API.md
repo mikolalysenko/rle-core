@@ -6,46 +6,26 @@ The library is split into several submodules which provide various features.  Th
 Here is a highlevel breakdown of the APIs:
 
 * [rle]
-
-** [rle.iterators]
-
-*** [createStencil]
-
-*** [StencilIterator]
-
-*** [createMultiStencil]
-
-*** [MultiIterator]
-
-** [rle.stencils]
-
-*** [SURFACE]
-
-*** [MOORE]
-
-*** [VON_NEUMANN]
-
-** [rle.binary]
-
-*** [BinaryRun]
-
-*** [BinaryVolume]
-
-*** [EMPTY_VOLUME]
-
-*** [sample]
-
-*** [merge]
-
-*** [union]
-
-*** [intersect]
-
-*** [complement]
-
-*** [dilate]
-
-*** [erode]
+  * [rle.iterators]
+    * [createStencil]
+    * [StencilIterator]
+    * [createMultiStencil]
+    * [MultiIterator]
+  * [rle.stencils]
+    * [SURFACE]
+    * [MOORE]
+    * [VON_NEUMANN]
+  * [rle.binary]
+    * [BinaryRun]
+    * [BinaryVolume]
+    * [EMPTY_VOLUME]
+    * [sample]
+    * [merge]
+    * [union]
+    * [intersect]
+    * [complement]
+    * [dilate]
+    * [erode]
 
 # rle #
 
