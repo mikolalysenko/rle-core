@@ -40,15 +40,15 @@ The library is split into several submodules which provide various features.  Th
 
 The root namespace for library.  Contains constants and common methods for operating on runs.
 
-### `POSITIVE_INFINITY`
+## `POSITIVE_INFINITY`
 
 Upper bound for coordinate system
 
-### `NEGATIVE_INFINITY`
+## `NEGATIVE_INFINITY`
 
 Lower bound for coordinate system
 
-### `compareCoord(a, b)`
+## `compareCoord(a, b)`
 
 Compares a pair of 3D vectors colexicographically to recover relative ranking.
 
@@ -64,7 +64,7 @@ Returns:
 
 Code for iterating over volumes
 
-### `createStencil(volume, stencil)`
+## `createStencil(volume, stencil)`
 
 Creates a stencil iterator for iterating over a run length encoded volume with the given stencil template.
 
@@ -80,39 +80,47 @@ Returns:
 
 A `StencilIterator` maintains a collection of pointers into a volume.
 
-Members:
+### Members
 
-* `volume`
-    A reference to the volume object to be iterated over.
+#### `volume`
 
-* `stencil`
-    An array of coordinate offsets representing the
+A reference to the volume object to be iterated over.
 
-* `ptrs`
-    An array of pointers into the volume representing the current runs at the position.
+#### `stencil`
 
-* `coord`
-    The current position of the iterator in the volume
+An array of coordinate offsets representing the
 
-Methods:
+#### `ptrs`
 
-* `clone()`
-    Returns: a copy of the stencil iterator
+An array of pointers into the volume representing the current runs at the position.
 
-* `hasNext()`
-    Returns: A boolean truth value representing whether the iterator is at the end of the volume.
+#### `coord`
+
+The current position of the iterator in the volume
+
+### Methods:
+
+#### `clone()`
+
+Returns a copy of the stencil iterator
+
+#### `hasNext()`
+
+Returns a boolean truth value representing whether the iterator is at the end of the volume.
+
+#### `next()`
+
+Advances the iterator to the next coordinate
     
-* `next()`
-    Advances the iterator to the next coordinate
-    
-* `nextCoord()`
-    Returns: The next coordinate of the iterator
+#### `nextCoord()`
 
-* `seek(ncoord)`
-    Sets the position of the iterator to ncoord
+Returns the next coordinate of the iterator
 
+#### `seek(ncoord)`
 
-### `createMultiStencil(volumes, stencil)`
+Sets the position of the iterator to ncoord
+
+## `createMultiStencil(volumes, stencil)`
 
 Creates a multi volume stencil iterator.
 
@@ -124,26 +132,52 @@ Params:
 
 A multi volume stencil iterator.
 
-Members:
-* `volumes`
-* `stencil`
-* `ptrs`
-* `coord`
+### Members
 
-Methods:
-* `clone()`: Makes a copy
-* `subiterator(n)`: Returns a `StencilIterator` associated to `volumes[n]` at the current position.
-* `hasNext()`: Returns `true` if `next()` will advance iterator, `false` otherwise.
-* `next()`: Advances the iterator to next run
-* `nextCoord()`: Returns the next coordinate of the iterator
-* `seek(coord)`: Sets the position of the iterator to `coord`
+#### `volumes`
+
+#### `stencil`
+
+#### `ptrs`
+
+#### `coord`
+
+### Methods
+
+#### `clone()`
+
+Returns a copy of the iterator
+
+#### `subiterator(n)`
+
+Params:
+* `n` is an integer between `0` and `volumes.length-1` inclusive identifying a particular volume.
+
+Returns:
+* A `StencilIterator` associated to `volumes[n]` at the current position of the iterator.
+
+#### `hasNext()`
+
+Returns `true` if `next()` will advance iterator, `false` otherwise.
+
+#### `next()`
+
+Advances the iterator to next run.
+
+#### `nextCoord()`
+
+Returns the next coordinate of the iterator
+
+#### `seek(coord)`
+
+Sets the position of the iterator to `coord`
 
 
 # `rle.stencils` #
 
 Some useful stencils for iterating over volumes.
 
-### `SURFACE`
+## `SURFACE`
 
 A 2x2x2 cube stencil:
     
@@ -158,7 +192,7 @@ A 2x2x2 cube stencil:
       [-1,-1,-1]
     ];
 
-### `MOORE`
+## `MOORE`
 
 A stencil representing the Moore neighborhood of a point:
 
@@ -172,7 +206,7 @@ A stencil representing the Moore neighborhood of a point:
       [ 0, 0, 1]
     ];
 
-### `VON_NEUMANN`
+## `VON_NEUMANN`
 
 A 3x3x3 cube centered at [0,0,0]:
 
@@ -193,32 +227,50 @@ This module contains code and utilities for working on 3D solid objects.
 
 A single run in a binary volume.
 
-Members:
-* `coord`: The start of the run
-* `value`: The value of the run
+### Members
 
-Methods:
-* None
+#### `coord`
+
+The start of the run
+
+#### `value`
+
+The value of the run
 
 
 ## `BinaryVolume(runs)`
 
 A data structure for representing smooth run length encoded volumetric data.  (In other words, a narrowband level set representation of a solid object).
 
-Members:
-* `runs`: An array of `BinaryRun` objects.
+### Members
 
-Methods:
-* `clone()`: Makes a deep copy of the volume
-* `testPoint(point)`: Tests if a single point is contained in the volume
-* `testPointList(point_list)`:  Tests if an array of points are contained within the volume.  Note that `point_list` will be sorted lexicographically.
-* `surface()`: Extracts a mesh from the binary volume using surface nets
+#### `runs`
 
-### `empty()`
+An array of `BinaryRun` objects.
+
+### Methods
+
+#### `clone()`
+
+Makes a deep copy of the volume
+
+#### `testPoint(point)`
+
+Tests if a single point is contained in the volume
+
+#### `testPointList(point_list)`
+
+Tests if an array of points are contained within the volume.  Note that `point_list` will be sorted lexicographically.
+
+#### `surface()`
+
+Extracts a mesh from the binary volume using surface nets
+
+## `empty()`
 
 Creates an empty volume object
 
-### `sample(resolution, potential)`
+## `sample(resolution, potential)`
 
 Params:
 * `resolution`: A length 3 array of integers representing the resolution at which to sample.
@@ -227,7 +279,7 @@ Params:
 Returns:
 * A `BinaryVolume` representing the potential function in the region `[0,0,0]` to `resolution`.
 
-### `merge(volumes, r_func)`
+## `merge(volumes, r_func)`
 
 Combines a collection of volumes together using an R-function.
 
@@ -238,43 +290,43 @@ Params:
 Returns:
 * A merged `BinaryVolume` which is obtained by applying `r_func` to each field point-wise.
 
-### `unite(a, b)`
+## `unite(a, b)`
 
 Returns the set-theoretic union of `BinaryVolume`s `a` and `b`
 
-### `intersect(a, b)`
+## `intersect(a, b)`
 
 Returns the set-theoretic intersection of `BinaryVolume`s `a` and `b`.
 
-### `subtract(a, b)`
+## `subtract(a, b)`
 
 Returns the set-theoretic difference of `a - b`.
 
-### `complement(a)`
+## `complement(a)`
 
 Returns the set-theoretic complement of `a`.
 
-### `dilate(volume, stencil)`
+## `dilate(volume, stencil)`
 
 Dilates `volume` by the structuring element `stencil`
 
-### `erode(volume, stencil)`
+## `erode(volume, stencil)`
 
 Erodes `volume` by the structuring element `stencil`.
 
-### `closing(volume, stencil)`
+## `closing(volume, stencil)`
 
 Computes the morphological closing of a volume.  Equivalent to:
 
     erode(dilate(volume, stencil), stencil)
 
-### `opening(volume, stencil)`
+## `opening(volume, stencil)`
 
 Computes the morphological opening of a volume.  Equivalent to:
 
     dilate(erode(volume, stencil), stencil)
 
-### `labelComponents(volume)`
+## `labelComponents(volume)`
 
 Labels all of the connected components within a `BinaryVolume`
 
@@ -285,7 +337,7 @@ Returns: An object containing the following members:
 * `count`: The number of connected components.
 * `labels`: An array of integers with length equal `count` representing the label of each component.
 
-### `splitComponents(volume, [labelStruct])`
+## `splitComponents(volume, [labelStruct])`
 
 Separates a volume into each of its connected components.
 
