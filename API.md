@@ -292,10 +292,6 @@ Makes a deep copy of the volume
 
 Tests if a single point is contained in the volume
 
-#### `testPointList(point_list)`
-
-Tests if an array of points are contained within the volume.  Note that `point_list` will be sorted lexicographically.
-
 #### `surface()`
 
 Extracts a mesh from the binary volume using surface nets

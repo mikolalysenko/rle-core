@@ -45,10 +45,10 @@ Documentation
 
 Here are some resources which explain how to use this library:
 
-* [API Reference]https://github.com/mikolalysenko/rle-voxels/blob/master/API.md)
-* Test cases
-* Interactive WebGL demo
-* Blog post on internals of rle-voxels
+* [API](https://github.com/mikolalysenko/rle-voxels/blob/master/API.md)
+* Examples
+* WebGL Demo
+* Blog
 
 Acknowledgements
 ================
