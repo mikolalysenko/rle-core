@@ -1,7 +1,6 @@
 "use strict"; "use restrict";
 
 var misc = require("./misc.js")
-  , iterators = require("./iterators.js")
   , DisjointSet = require("./disjoint_set.js").DisjointSet;
 
 //Import globals
@@ -15,8 +14,8 @@ var compareCoord      = misc.compareCoord
   , SURFACE_STENCIL   = misc.SURFACE_STENCIL;
 
 //Import iterators
-var createStencil       = iterators.createStencil
-  , createMultiStencil  = iterators.createMultiStencil;
+var createStencil       = require("./stencil_iterator").createStencil
+  , createMultiStencil  = require("./multi_iterator").createMultiStencil;
 
 //Run data structure
 var Run = new Function("coord", "value", [
