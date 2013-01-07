@@ -49,45 +49,34 @@ A `StencilIterator` maintains a collection of pointers into a volume.
 
 Members:
 
-* `volume` 
-
+* `volume`
     A reference to the volume object to be iterated over.
 
 * `stencil`
-
     An array of coordinate offsets representing the
 
 * `ptrs`
-
     An array of pointers into the volume representing the current runs at the position.
 
 * `coord`
-
     The current position of the iterator in the volume
 
 Methods:
 
 * `clone()`
-
     Returns: a copy of the stencil iterator
 
 * `hasNext()`
-  
     Returns: A boolean truth value representing whether the iterator is at the end of the volume.
     
 * `next()`
-  
     Advances the iterator to the next coordinate
     
 * `nextCoord()`
-
     Returns: The next coordinate of the iterator
 
 * `seek(ncoord)`
-
     Sets the position of the iterator to ncoord
-
-
 
 
 ### `createMultiStencil(volumes, stencil)`
