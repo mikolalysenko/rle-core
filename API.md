@@ -83,25 +83,32 @@ Methods:
 
 Creates a multi volume stencil iterator that walks over multiple volumes simultaneously.
 
+Params:
+* `
 
-## `MultiIterator`
+
+## `MultiIterator(volumes, stencil, ptrs, coord)`
 
 A multi volume stencil iterator.
 
-### `MultiIterator.clone()`
+Members:
+* `volumes`
+* `stencil`
+* `ptrs`
+* `coord`
 
-### `MultiIterator.hasNext()`
-
-### `MultiIterator.next()`
-
-### `MultiIterator.nextCoord()`
-
-### `MultiIterator.seek(coord)`
+Methods:
+* `clone()`: Makes a copy
+* `subiterator(n)`: Returns a `StencilIterator` associated to `volumes[n]` at the current position.
+* `hasNext()`: Returns `true` if `next()` will advance iterator, `false` otherwise.
+* `next()`: Advances the iterator to next run
+* `nextCoord()`: Returns the next coordinate of the iterator
+* `seek(coord)`: Sets the position of the iterator to `coord`
 
 
 # `rle.stencils` #
 
-Some useful templates for iterating over volumes.
+Some useful stencils for iterating over volumes.
 
 ### `SURFACE`
 
@@ -151,18 +158,22 @@ This module contains code and utilities for working on 3D solid objects.
 
 ## `BinaryRun(coord, value)`
 
+Members:
+* `coord`
+* `value`
+
 
 ## `BinaryVolume(runs)`
 
-### `BinaryVolume.clone()`
+Members:
+* `runs`
 
-### `BinaryVolume.surface()`
-
-### `BinaryVolume.labelComponents()`
-
-### `BinaryVolume.splitComponents([labels])`
-
-### `BinaryVolume.pmc(point)`
+Methods:
+* `clone()`
+* `testPoint(point)`
+* `surface()`
+* `labelComponents()`
+* `splitComponents()`
 
 
 ### `EMPTY_VOLUME`
