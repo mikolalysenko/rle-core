@@ -2,6 +2,40 @@
 
 The library is split into several submodules which provide various features.  These are stored in various subobjects below the main library.  There are also some commonly used functions which are stored in the root namespace of the library.
 
+## Table of contents ##
+
+- [API Overview](#api-overview)
+- [rle](#rle)
+		- [POSITIVE_INFINITY](#positive_infinity)
+		- [NEGATIVE_INFINITY](#negative_infinity)
+		- [compareCoord(a, b)](#comparecoorda-b)
+- [rle.iterators](#rleiterators)
+		- [createStencil(volume, stencil)](#createstencilvolume-stencil)
+	- [StencilIterator(volume, stencil, ptrs, coord)](#stenciliteratorvolume-stencil-ptrs-coord)
+		- [createMultiStencil(volumes, stencil)](#createmultistencilvolumes-stencil)
+	- [MultiIterator(volumes, stencil, ptrs, coord)](#multiiteratorvolumes-stencil-ptrs-coord)
+- [rle.stencils](#rlestencils)
+		- [SURFACE](#surface)
+		- [MOORE](#moore)
+		- [VON_NEUMANN](#von_neumann)
+- [rle.binary](#rlebinary)
+	- [BinaryRun(coord, value)](#binaryruncoord-value)
+	- [BinaryVolume(runs)](#binaryvolumeruns)
+		- [empty()](#empty)
+		- [sample(resolution, potential)](#sampleresolution-potential)
+		- [merge(volumes, r_func)](#mergevolumes-r_func)
+		- [unite(a, b)](#unitea-b)
+		- [intersect(a, b)](#intersecta-b)
+		- [subtract(a, b)](#subtracta-b)
+		- [complement(a)](#complementa)
+		- [dilate(volume, stencil)](#dilatevolume-stencil)
+		- [erode(volume, stencil)](#erodevolume-stencil)
+		- [closing(volume, stencil)](#closingvolume-stencil)
+		- [opening(volume, stencil)](#openingvolume-stencil)
+		- [labelComponents(volume)](#labelcomponentsvolume)
+		- [splitComponents(volume, [labelStruct])](#splitcomponentsvolume-labelstruct)
+
+
 # `rle` #
 
 The root namespace for library.  Contains constants and common methods for operating on runs.
