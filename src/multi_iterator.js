@@ -69,7 +69,7 @@ MultiIterator.prototype.nextCoord_rv = function(ncoord) {
         tcoord[k] = x[k] - delta[k];
       }
       if(compareCoord(tcoord, ncoord) < 0) {
-        for(var k=0; k<3; ++k) [
+        for(var k=0; k<3; ++k) {
           ncoord[k] = tcoord[k];
         }
       }

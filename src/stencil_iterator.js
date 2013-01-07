@@ -48,7 +48,7 @@ StencilIterator.prototype.nextCoord_rv = function(ncoord) {
     for(var j=0; j<3; ++j) {
       tcoord[j] = nr[j] - delta[j];
     }
-    if(lex_compare(tcoord, ncoord) < 0) {
+    if(compareCoord(tcoord, ncoord) < 0) {
       for(var j=0; j<3; ++j) {
         ncoord[j] = tcoord[j];
       }
@@ -117,7 +117,7 @@ function createStencil(volume, stencil) {
     ptrs[i] = 0;
   }
   return new StencilIterator(
-    this,
+    volume,
     stencil,
     ptrs,
     [NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY]

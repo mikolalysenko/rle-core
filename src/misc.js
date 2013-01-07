@@ -1,11 +1,11 @@
-var EPSILON           = 1e-6
-  , POSITIVE_INFINITY =  (1<<30)
-  , NEGATIVE_INFINITY = -(1<<30)
-  , EDGE_TABLE        = new Array(256)  //List of 12-bit masks describing edge crossings
-  , CUBE_EDGES        = new Array(12)   //List of 12 edges of cube
-  , MOORE_STENCIL     = [ [0,0,0] ]
-  , SURFACE_STENCIL   = [ ]
-  , VON_NEUMANN_STENCIL
+var EPSILON             = 1e-6
+  , POSITIVE_INFINITY   =  (1<<30)
+  , NEGATIVE_INFINITY   = -(1<<30)
+  , EDGE_TABLE          = new Array(256)  //List of 12-bit masks describing edge crossings
+  , CUBE_EDGES          = new Array(12)   //List of 12 edges of cube
+  , MOORE_STENCIL       = [ [0,0,0] ]
+  , SURFACE_STENCIL     = [ ]
+  , VON_NEUMANN_STENCIL = [ ];
 
 //Compare two runs
 var compareCoord = new Function("ra", "rb", [

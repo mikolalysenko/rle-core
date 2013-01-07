@@ -1,7 +1,7 @@
 //Import libraries
 var $             = require('jquery-browserify')
-  , GLOW          = require('./GLOW.js')
-  , ArcballCamera = require('arcball')
+  , GLOW          = require('./GLOW.js').GLOW
+  , ArcballCamera = require('arcball').ArcballCamera
   , utils         = require('./utils.js')
   , EventEmitter  = require('events').EventEmitter;
 
@@ -10,18 +10,23 @@ exports.makeShell = function(params) {
     params = {};
   }
   var shell = {};
-  var bg_color    = params.bg_color ? [ 0.1, 0.2, 0.8 ]
-    , camera_pos  = params.camera_pos ? [ 0, 0, 50 ]
-    , container   = params.container ? "#container";
+  var bg_color    = params.bg_color   || [ 0.3, 0.5, 0.87 ]
+    , camera_pos  = params.camera_pos || [ 0, 0, 50 ]
+    , container   = params.container  || "#container";
 
   //Create event emitter
   shell.events = new EventEmitter();
 
   //Initialize GLOW
   shell.context = new GLOW.Context();
-  if(!context.enableExtension("OES_texture_float")) {
+  if(!shell.context.enableExtension("OES_texture_float")) {
     throw new Exception("No support for float textures");
   }
+  shell.context.setupClear({
+      red:    bg_color[0]
+    , green:  bg_color[1]
+    , blue:   bg_color[2]
+  });
   GLOW.defaultCamera.localMatrix.setPosition(
       camera_pos[0]
     , camera_pos[1]
@@ -38,12 +43,12 @@ exports.makeShell = function(params) {
   };
   
   //Hook up controls
-  var buttons = this.buttons;
+  var buttons = shell.buttons;
   shell.container = container;
-  $(container).appendChild( shell.context.domElement );
+  $(container)[0].appendChild( shell.context.domElement );
   $(container).mousemove(function(e) {
     var c = $(container);
-    c.update(e.pageX/c.width()-0.5, e.pageY/container.height()-0.5, {
+    shell.camera.update(e.pageX/c.width()-0.5, e.pageY/c.height()-0.5, {
       rotate: buttons.rotate || !(e.ctrlKey || e.shiftKey) && (e.which === 1),
       pan:    buttons.pan    || (e.ctrlKey && e.which !== 0) || (e.which === 2),
       zoom:   buttons.zoom   || (e.shiftlKey && e.which !== 0) || e.which === 3
@@ -75,7 +80,7 @@ exports.makeShell = function(params) {
   //Render loop
   function render() {
     shell.context.cache.clear();
-    shell.context.enableDepthTesting();
+    shell.context.enableDepthTest(true);
     shell.context.enableCulling(false);
     shell.context.clear();
   
@@ -83,6 +88,8 @@ exports.makeShell = function(params) {
     
     utils.nextFrame(render);
   }
+  
+  render();
   
   return shell;
 }

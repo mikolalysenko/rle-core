@@ -9,7 +9,7 @@ exports.flatten = function(arr) {
   return result;
 }
 
-exports.nextFrame = (function(){
+var nextFrame = (function(){
     return  window.requestAnimationFrame       ||
             window.webkitRequestAnimationFrame || 
             window.mozRequestAnimationFrame    || 
@@ -19,6 +19,8 @@ exports.nextFrame = (function(){
               window.setTimeout(callback, 1000 / 60);
             };
   })();
+
+exports.nextFrame = function(f) { nextFrame(f); };
 
 exports.printVec3 = function(vec) {
   return "vec3(" + vec[0] + "," + vec[1] + "," + vec[2] + ")";

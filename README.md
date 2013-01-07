@@ -38,7 +38,7 @@ Internally rle-voxels represents a volume as a list of runs sorted in colexicogr
 Limitations
 -----------
 
-rle-voxels does not support in place updates of volumes.  The reason for this is that there is no standard balanced binary search tree data structure for Javascript, and so far I haven't seen any performant implementations which would be suitable for storing the large sort of data sets.  Ideally, the best sort of data structure would be a cache-oblivious B* tree, but implementing this within Javascript is incredibly difficult due to the fact that it is hard to make gaurantees about the placement of structures in memory.
+rle-voxels does not support efficient in place updates of volumes (though this may change in the future).  The reason for this is that there is no standard balanced binary search tree data structure for Javascript, and so far I haven't seen any performant implementations which would be suitable for storing the large sort of data sets.  Ideally, the best sort of data structure would be a cache-oblivious B* tree, but implementing this within Javascript is incredibly difficult due to the fact that it is hard to make gaurantees about the placement of structures in memory.
 
 Documentation
 =============
