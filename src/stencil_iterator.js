@@ -2,7 +2,8 @@
 
 var misc = require("./misc.js");
 
-var lex_compare = misc.lex_compare
+var compareCoord      = misc.compareCoord
+  , bisect            = misc.bisect
   , POSITIVE_INFINITY = misc.POSITIVE_INFINITY
   , NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
 
@@ -94,7 +95,23 @@ outer_loop:
   }
 }
 
-function stencil_begin(volume, stencil) {
+//Seek to target coordinate
+StencilIterator.prototype.seek = function(coord) {
+  var runs    = this.volume.runs
+    , ptrs    = this.ptrs
+    , stencil = this.stencil
+    , tcoord  = [0,0,0];
+  for(var i=0; i<stencil.length; ++i) {
+    var delta = stencil[i];
+    for(var j=0; j<3; ++j) {
+      tcoord[j] = coord[j] + delta[j];
+    }
+    ptrs[i] = bisect(runs, 0, runs.length, tcoord);
+  }
+}
+
+//Creates a stencil iterator
+function createStencil(volume, stencil) {
   var ptrs = new Array(stencil.length);
   for(var i=0; i<stencil.length; ++i) {
     ptrs[i] = 0;
@@ -106,5 +123,6 @@ function stencil_begin(volume, stencil) {
     [NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY]
   );
 }
+
 exports.StencilIterator = StencilIterator;
-exports.stencil_begin   = stencil_begin;
+exports.createStencil   = createStencil;

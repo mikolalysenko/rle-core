@@ -5,7 +5,7 @@ var misc = require("./misc.js")
   , DisjointSet = require("./disjoint_set.js").DisjointSet;
 
 //Import globals
-var lex_compare       = misc.lex_compare
+var compareCoord      = misc.compareCoord
   , EPSILON           = misc.EPSILON
   , POSITIVE_INFINITY = misc.POSITIVE_INFINITY
   , NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY
@@ -15,8 +15,8 @@ var lex_compare       = misc.lex_compare
   , SURFACE_STENCIL   = misc.SURFACE_STENCIL;
 
 //Import iterators
-var stencil_begin     = iterators.stencil_begin
-  , multi_begin       = iterators.multi_begin;
+var createStencil       = iterators.createStencil
+  , createMultiStencil  = iterators.createMultiStencil;
 
 //Run data structure
 var Run = new Function("coord", "value", [
@@ -39,11 +39,6 @@ function BinaryVolume(runs, nfaces) {
   this.runs       = runs;
 };
 
-//Create a stencil iterator
-BinaryVolume.prototype.stencil_begin = function(stencil) {
-  return stencil_begin(this, stencil);
-}
-
 //Make a copy of a volume
 BinaryVolume.prototype.clone = function() {
   var nruns = new Array(this.runs.length);
@@ -56,11 +51,11 @@ BinaryVolume.prototype.clone = function() {
 }
 
 //Extracts all connected components of the volume
-BinaryVolume.prototype.label_components = function() {
+BinaryVolume.prototype.labelComponents = function() {
   //First assign labels
   var forest = new DisjointSet(this.runs.length)
     , runs   = this.runs;
-  for(var iter=this.stencil_begin(SURFACE_STENCIL); iter.hasNext(); iter.next()) {
+  for(var iter=createStencil(this, SURFACE_STENCIL); iter.hasNext(); iter.next()) {
     if(runs[iter.ptrs[0]].value < 0) {
       continue;
     }
@@ -99,9 +94,9 @@ BinaryVolume.prototype.label_components = function() {
 
 //Extracts all components.  label_struct is the result of running label_components
 // and is reused if possible
-BinaryVolume.prototype.split_components = function(label_struct) {
+BinaryVolume.prototype.splitComponents = function(label_struct) {
   if(!label_struct) {
-    label_struct = this.label_components;
+    label_struct = this.labelComponents;
   }
   var count       = label_struct.count
     , labels      = label_struct.clabels
@@ -110,7 +105,7 @@ BinaryVolume.prototype.split_components = function(label_struct) {
     components[i] = [ ];
   }
   var runs = this.runs;
-  for(var iter=this.stencil_begin(MOORE_STENCIL); iter.hasNext(); iter.next()) {
+  for(var iter=createStencil(this, MOORE_STENCIL); iter.hasNext(); iter.next()) {
     var ptrs    = iter.ptrs
       , center  = runs[ptrs[0]];
     if(center.value < 0) {
@@ -122,14 +117,14 @@ BinaryVolume.prototype.split_components = function(label_struct) {
         }
         var id = labels[ptrs[i]]
           , cc = components[id];
-        if(lex_compare(cc[cc.length-1].coord, center.coord) < 0) {
+        if(compareCoord(cc[cc.length-1].coord, center.coord) < 0) {
           cc.push(new Run(center.coord.slice(0), center.value));
         }
       }
     } else {
       var id = labels[ptrs[0]]
         , cc = components[id];
-      if(lex_compare(cc[cc.length-1].coord, center.coord) < 0) {
+      if(compareCoord(cc[cc.length-1].coord, center.coord) < 0) {
         cc.push(new Run(center.coord.slice(0), center.value));
       }
     }
@@ -152,7 +147,7 @@ BinaryVolume.prototype.surface = function() {
     , v_ptr     = [0,0,0,0,0,0,0,0]
     , nc        = [0,0,0]
     , nd        = [0,0,0];
-  for(var iter=this.stencil_begin(SURFACE_STENCIL); iter.hasNext(); iter.next()) {
+  for(var iter=createStencil(this, SURFACE_STENCIL); iter.hasNext(); iter.next()) {
     //Read in values and mask
     var ptrs = iter.ptrs
       , mask = 0;
@@ -194,7 +189,7 @@ BinaryVolume.prototype.surface = function() {
         nc[j] = coord[j] - ((i&(1<<j)) ? 1 : 0);
         nd[j] = Math.ceil(p[j]);
       }
-      if(lex_compare(nc, nd) > 0) {
+      if(compareCoord(nc, nd) > 0) {
         ++v_ptr[i];
       }
     }
@@ -258,7 +253,7 @@ outer_loop:
 function merge(volumes, merge_func) {
   var merged_runs = []
     , values      = new Array(volumes.length);
-  for(var iter = multi_begin(volumes, MOORE_STENCIL); iter.hasNext(); iter.next()) {
+  for(var iter = createMultiStencil(volumes, MOORE_STENCIL); iter.hasNext(); iter.next()) {
   
     for(var i=0; i<values.length; ++i) {
       values[i] = volumes[i].runs[iter.ptrs[i][0]].value;
@@ -278,6 +273,40 @@ function merge(volumes, merge_func) {
   }
   return new BinaryVolume(merged_runs);
 }
+
+//Dilate by fixed stencil
+function dilate(volume, stencil) {
+  var runs = volume.runs
+    , nruns = [ new Run([NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY], nruns[0].value) ];
+  for(var iter=createStencil(volume, stencil); iter.hasNext(); iter.next()) {
+    var v = Number.POSITIVE_INFINITY;
+    for(var i=0; i<stencil.length; ++i) {
+      v = Math.min(v, runs[iter.ptrs[i]].value);
+    }
+    if((nruns[nruns.length-1].value < 0) !== (v < 0)) {
+      nruns.push(new Run(iter.coord.slice(0), v));
+    }
+  }
+  return new BinaryVolume(nruns);
+}
+
+
+function erode(volume, stencil) {
+  var runs = volume.runs
+    , nruns = [ new Run([NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY], nruns[0].value) ];
+  for(var iter=createStencil(volume, stencil); iter.hasNext(); iter.next()) {
+    var v = Number.NEGATIVE_INFINITY;
+    for(var i=0; i<stencil.length; ++i) {
+      v = Math.max(v, runs[iter.ptrs[i]].value);
+    }
+    if((nruns[nruns.length-1].value < 0) !== (v < 0)) {
+      nruns.push(new Run(iter.coord.slice(0), v));
+    }
+  }
+  return new BinaryVolume(nruns);
+}
+
+
 
 //Subtract a function
 var SUBTRACT_FUNC   = new Function("a", "return Math.min(a[0],-a[1]);" )
@@ -302,6 +331,12 @@ exports.complement = function(a)    {
   }
   return new BinaryVolume(nruns);
 };
+
+//Morphological operations
+exports.dilate      = dilate;
+exports.erode       = erode;
+exports.closing     = function(volume, stencil) { return erode(dilate(volume, stencil), stencil); }
+exports.opening     = function(volume, stencil) { return dilate(erode(volume, stencil), stencil); }
 
 //Create empty volume
 Object.defineProperty(exports, "EMPTY_VOLUME", {

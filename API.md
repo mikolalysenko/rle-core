@@ -18,14 +18,13 @@ Lower bound for coordinate system
 
 Compares a pair of 3D vectors colexicographically to recover relative ranking.
 
+Params:
+* a, b : A pair of 3D vectors
+
 Returns:
 * < 0 if a comes before b
 * > 0 if b comes before a
 * = 0 if rank of a = rank of b
-
-### `bisect(runs, lo, hi, coord)`
-
-Finds the lower bound on coord within the range [lo, hi) of runs.
 
 
 # rle.iterators #
@@ -36,65 +35,79 @@ Code for iterating over volumes
 
 Creates a stencil iterator for iterating over a run length encoded volume with the given stencil template.
 
+Params:
+* `volume`  : A run length encoded volume (eg. a BinaryVolume)
+* `stencil` : An array of length 3 arrays representing the coordinates of a stencil
+
+Returns:
+* A `StencilIterator` object pointing to the start of volume
+
+
+## `StencilIterator(volume, stencil, ptrs, coord)`
+
+A `StencilIterator` maintains a collection of pointers into a volume.
+
+Members:
+
+* `volume` 
+
+    A reference to the volume object to be iterated over.
+
+* `stencil`
+
+    An array of coordinate offsets representing the
+
+* `ptrs`
+
+    An array of pointers into the volume representing the current runs at the position.
+
+* `coord`
+
+    The current position of the iterator in the volume
+
+Methods:
+
+* `clone()`
+
+    Returns: a copy of the stencil iterator
+
+* `hasNext()`
+  
+    Returns: A boolean truth value representing whether the iterator is at the end of the volume.
+    
+* `next()`
+  
+    Advances the iterator to the next coordinate
+    
+* `nextCoord()`
+
+    Returns: The next coordinate of the iterator
+
+* `seek(ncoord)`
+
+    Sets the position of the iterator to ncoord
+
+
+
 
 ### `createMultiStencil(volumes, stencil)`
 
 Creates a multi volume stencil iterator that walks over multiple volumes simultaneously.
 
-## `StencilIterator`
 
-A `StencilIterator` walks over a volume in a fixed pattern.  
-
-### `StencilIterator.volume`
-
-A reference to the volume this iterator is walking over.
-
-### `StencilIterator.stencil`
-
-An array of 3D coordinates representing the offsets of the stencil.
-
-### `StencilIterator.ptrs`
-
-An array of integers representing the current position of the iterator in the volume.
-
-### `StencilIterator.coord`
-
-A 3D vector representing the current coordinate of the stencil.
-
-### `StencilIterator.clone()`
-
-Returns a copy of the stencil iterator
-
-### `StencilIterator.hasNext()`
-
-Checks if iterator is at end of list.
-
-### `StencilIterator.next()`
-
-Advances stencil of iterators by one run.
-
-### `StencilIterator.nextCoord()`
-
-Returns the next coordinate of the iterator.
-
-#### `StencilIterator.seek(coord)`
-
-Sets the iterator to coordinate.
-
-
-### `MultiIterator`
+## `MultiIterator`
 
 A multi volume stencil iterator.
 
-#### `MultiIterator.clone()`
+### `MultiIterator.clone()`
 
-#### `MultiIterator.hasNext()`
+### `MultiIterator.hasNext()`
 
-#### `MultiIterator.next()`
+### `MultiIterator.next()`
 
-#### `MultiIterator.nextCoord()`
+### `MultiIterator.nextCoord()`
 
-#### `MultiIterator.seek(coord)`
+### `MultiIterator.seek(coord)`
 
 
 # `rle.stencils` #
@@ -147,18 +160,20 @@ A 3x3x3 cube centered at [0,0,0]:
 This module contains code and utilities for working on 3D solid objects.
 
 
-### `BinaryRun(coord, value)`
+## `BinaryRun(coord, value)`
 
 
-### `BinaryVolume(runs)`
+## `BinaryVolume(runs)`
 
-#### `BinaryVolume.clone()`
+### `BinaryVolume.clone()`
 
-#### `BinaryVolume.surface()`
+### `BinaryVolume.surface()`
 
-#### `BinaryVolume.labelComponents()`
+### `BinaryVolume.labelComponents()`
 
-#### `BinaryVolume.splitComponents([labels])`
+### `BinaryVolume.splitComponents([labels])`
+
+### `BinaryVolume.pmc(point)`
 
 
 ### `EMPTY_VOLUME`

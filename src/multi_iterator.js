@@ -2,7 +2,7 @@
 
 var misc = require("./misc.js");
 
-var lex_compare       = misc.lex_compare
+var compareCoord      = misc.compareCoord
   , POSITIVE_INFINITY = misc.POSITIVE_INFINITY
   , NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
 
@@ -31,7 +31,7 @@ MultiIterator.prototype.clone = function() {
 }
 
 //Extract an individual component of this iterator
-MultiIterator.prototype.stencil_iterator = function(i) {
+MultiIterator.prototype.subiterator = function(i) {
   return new StencilIterator(
     this.volumes[i],
     this.stencil,
@@ -68,7 +68,7 @@ MultiIterator.prototype.nextCoord_rv = function(ncoord) {
       for(var k=0; k<3; ++k) {
         tcoord[k] = x[k] - delta[k];
       }
-      if(lex_compare(tcoord, ncoord) < 0) {
+      if(compareCoord(tcoord, ncoord) < 0) {
         for(var k=0; k<3; ++k) [
           ncoord[k] = tcoord[k];
         }
@@ -117,8 +117,14 @@ outer_loop:
   }
 }
 
+//Seek to coordinate
+MultiIterator.prototype.seek = function(coord) {
+  throw "NOT IMPLEMENTED YET";
+}
+
+
 //Perform a multiway iteration over a collection of volumes
-function multi_begin(volumes, stencil) {
+function createMultiStencil(volumes, stencil) {
   return new MultiIterator(
     volumes,
     stencil,
@@ -127,5 +133,5 @@ function multi_begin(volumes, stencil) {
   );
 }
 
-exports.MultiIterator   = MultiIterator;
-exports.multi_begin     = multi_begin;
+exports.MultiIterator       = MultiIterator;
+exports.createMultiStencil  = createMultiStencil;
