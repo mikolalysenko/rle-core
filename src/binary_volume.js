@@ -50,92 +50,9 @@ BinaryVolume.prototype.clone = function() {
   return new BinaryVolume(nruns);
 }
 
-//Extracts all connected components of the volume
-BinaryVolume.prototype.labelComponents = function() {
-  //First assign labels
-  var forest = new DisjointSet(this.runs.length)
-    , runs   = this.runs;
-  for(var iter=createStencil(this, SURFACE_STENCIL); iter.hasNext(); iter.next()) {
-    if(runs[iter.ptrs[0]].value < 0) {
-      continue;
-    }
-    for(var i=1; i<8; ++i) {
-      if(runs[iter.ptrs[i]].value < 0) {
-        continue;
-      }
-      forest.link(iter.ptrs[0], iter.ptrs[i]);
-    }
-  }
-  //Then mark components using labels
-  //HACK: Reuse rank array for labels
-  var clabels          = forest.ranks
-    , root2label       = []
-    , component_count  = 0;
-  for(var i=0; i<runs.length(); ++i) {
-    var run = runs[i];
-    if(run.value < 0) {
-      clabels[i] = -1;
-      continue;
-    }
-    var root = forest.find(i);
-    if(root in root2label) {
-      clabels[i] = root2label[root];
-    } else {
-      root2label[root] = component_count;
-      clabels[i] = component_count;
-      component_count++;
-    }
-  }
-  return {
-      count: component_count
-    , labels: clabels
-  }
-}
-
-//Extracts all components.  label_struct is the result of running label_components
-// and is reused if possible
-BinaryVolume.prototype.splitComponents = function(label_struct) {
-  if(!label_struct) {
-    label_struct = this.labelComponents;
-  }
-  var count       = label_struct.count
-    , labels      = label_struct.clabels
-    , components  = new Array(count);
-  for(var i=0; i<count; ++i) {
-    components[i] = [ ];
-  }
-  var runs = this.runs;
-  for(var iter=createStencil(this, MOORE_STENCIL); iter.hasNext(); iter.next()) {
-    var ptrs    = iter.ptrs
-      , center  = runs[ptrs[0]];
-    if(center.value < 0) {
-      //Check each neighbor
-      for(var i=1; i<7; ++i) {
-        var neighbor = runs[ptrs[i]];
-        if(neighbor.value < 0) {
-          continue;
-        }
-        var id = labels[ptrs[i]]
-          , cc = components[id];
-        if(compareCoord(cc[cc.length-1].coord, center.coord) < 0) {
-          cc.push(new Run(center.coord.slice(0), center.value));
-        }
-      }
-    } else {
-      var id = labels[ptrs[0]]
-        , cc = components[id];
-      if(compareCoord(cc[cc.length-1].coord, center.coord) < 0) {
-        cc.push(new Run(center.coord.slice(0), center.value));
-      }
-    }
-  }
-  
-  //Convert components back into volumes
-  var volumes = new Array(count);
-  for(var i=0; i<count; ++i) {
-    volumes[i] = new BinaryVolume(components[i]);
-  }
-  return volumes;
+//Checks if a point is contained in a volume
+BinaryVolume.prototype.testPoint = function(point) {
+  return false;
 }
 
 //Extracts a surface from the volume using elastic surface nets
@@ -306,6 +223,93 @@ function erode(volume, stencil) {
   return new BinaryVolume(nruns);
 }
 
+//Extracts all connected components of the volume
+function labelComponents(volume) {
+  //First assign labels
+  var runs   = this.runs
+    , forest = new DisjointSet(runs.length);
+  for(var iter=createStencil(volume, SURFACE_STENCIL); iter.hasNext(); iter.next()) {
+    if(runs[iter.ptrs[0]].value < 0) {
+      continue;
+    }
+    for(var i=1; i<8; ++i) {
+      if(runs[iter.ptrs[i]].value < 0) {
+        continue;
+      }
+      forest.link(iter.ptrs[0], iter.ptrs[i]);
+    }
+  }
+  //Then mark components using labels
+  //HACK: Reuse rank array for labels
+  var clabels          = forest.ranks
+    , root2label       = []
+    , component_count  = 0;
+  for(var i=0; i<runs.length(); ++i) {
+    var run = runs[i];
+    if(run.value < 0) {
+      clabels[i] = -1;
+      continue;
+    }
+    var root = forest.find(i);
+    if(root in root2label) {
+      clabels[i] = root2label[root];
+    } else {
+      root2label[root] = component_count;
+      clabels[i] = component_count;
+      component_count++;
+    }
+  }
+  return {
+      count: component_count
+    , labels: clabels
+  }
+}
+
+//Extracts all components.  label_struct is the result of running label_components
+// and is reused if possible
+function splitComponents(volume, label_struct) {
+  if(!label_struct) {
+    label_struct = this.labelComponents;
+  }
+  var count       = label_struct.count
+    , labels      = label_struct.clabels
+    , components  = new Array(count);
+  for(var i=0; i<count; ++i) {
+    components[i] = [ ];
+  }
+  var runs = volume.runs;
+  for(var iter=createStencil(volume, MOORE_STENCIL); iter.hasNext(); iter.next()) {
+    var ptrs    = iter.ptrs
+      , center  = runs[ptrs[0]];
+    if(center.value < 0) {
+      //Check each neighbor
+      for(var i=1; i<7; ++i) {
+        var neighbor = runs[ptrs[i]];
+        if(neighbor.value < 0) {
+          continue;
+        }
+        var id = labels[ptrs[i]]
+          , cc = components[id];
+        if(compareCoord(cc[cc.length-1].coord, center.coord) < 0) {
+          cc.push(new Run(center.coord.slice(0), center.value));
+        }
+      }
+    } else {
+      var id = labels[ptrs[0]]
+        , cc = components[id];
+      if(compareCoord(cc[cc.length-1].coord, center.coord) < 0) {
+        cc.push(new Run(center.coord.slice(0), center.value));
+      }
+    }
+  }
+  //Convert components back into volumes
+  var volumes = new Array(count);
+  for(var i=0; i<count; ++i) {
+    volumes[i] = new BinaryVolume(components[i]);
+  }
+  return volumes;
+}
+
 
 
 //Subtract a function
@@ -338,7 +342,11 @@ exports.erode       = erode;
 exports.closing     = function(volume, stencil) { return erode(dilate(volume, stencil), stencil); }
 exports.opening     = function(volume, stencil) { return dilate(erode(volume, stencil), stencil); }
 
-//Create empty volume
+//Topological stuff
+exports.labelComponents = labelComponents;
+exports.splitComponents = splitComponents;
+
+//Empty volume constructor
 Object.defineProperty(exports, "EMPTY_VOLUME", {
   get: function() {
     return new BinaryVolume([

@@ -26,7 +26,6 @@ Returns:
 * > 0 if b comes before a
 * = 0 if rank of a = rank of b
 
-
 # rle.iterators #
 
 Code for iterating over volumes
@@ -81,11 +80,11 @@ Methods:
 
 ### `createMultiStencil(volumes, stencil)`
 
-Creates a multi volume stencil iterator that walks over multiple volumes simultaneously.
+Creates a multi volume stencil iterator.
 
 Params:
-* `
-
+* `volumes`: An array of volume objects (eg. `BinaryVolume`s)
+* `stencil`: A stencil, just like in `createStencil()`
 
 ## `MultiIterator(volumes, stencil, ptrs, coord)`
 
@@ -158,32 +157,62 @@ This module contains code and utilities for working on 3D solid objects.
 
 ## `BinaryRun(coord, value)`
 
+A single run in a binary volume.
+
 Members:
-* `coord`
-* `value`
+* `coord`: The start of the run
+* `value`: The value of the run
+
+Methods:
+* None
 
 
 ## `BinaryVolume(runs)`
 
+A data structure for representing smooth run length encoded volumetric data.  (In other words, a narrowband level set representation of a solid object).
+
 Members:
-* `runs`
+* `runs`: An array of `BinaryRun` objects.
 
 Methods:
-* `clone()`
-* `testPoint(point)`
-* `surface()`
-* `labelComponents()`
-* `splitComponents()`
+* `clone()`: Makes a deep copy of the volume
+* `testPoint(point)`: Tests if a single point is contained in the volume
+* `testPointList(point_list)`:  Tests if an array of points are contained within the volume.  Note that `point_list` will be sorted lexicographically.
+* `surface()`: Extracts a mesh from the binary volume using surface nets
 
 
 ### `EMPTY_VOLUME`
 
-
 ### `sample(resolution, potential)`
 
-### `merge(volumes, merge_func)`
+Params:
+* `resolution`: A length 3 array of integers representing the resolution at which to sample.
+* `potential`: A function taking a 3D vector as input that returns an approximation of the signed distance field of some solid object.
+
+Returns:
+* A `BinaryVolume` representing the potential function in the region `[0,0,0]` to `resolution`.
+
+### `merge(volumes, r_func)`
+
+Combines a collection of volumes together using an R-function.
+
+Params:
+* `volumes`: An array of volume objects
+* `r_func`: An R-function
+
+Returns:
+* A merged `BinaryVolume` which is obtained by applying `r_func` to each field point-wise.
 
 ### `union(a, b)`
+
+Approximately computes the set-theoretic union of two binary volumes.
+
+Params:
+* `a,b`: A pair of `BinaryVolume`s.
+
+Returns:
+* The pointwise union of `a` and `b`.
+
 
 ### `intersect(a, b)`
 
@@ -191,7 +220,12 @@ Methods:
 
 ### `complement(a)`
 
-### `dilate(a, kernel)`
+### `dilate(volume, kernel)`
 
-### `erode(a, kernel)`
+### `erode(volume, kernel)`
+
+### `labelComponents(volume)`
+
+### `splitComponents(volume, [labelStruct])`
+
 
