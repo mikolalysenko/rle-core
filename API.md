@@ -180,8 +180,9 @@ Methods:
 * `testPointList(point_list)`:  Tests if an array of points are contained within the volume.  Note that `point_list` will be sorted lexicographically.
 * `surface()`: Extracts a mesh from the binary volume using surface nets
 
+### `empty()`
 
-### `EMPTY_VOLUME`
+Creates an empty volume object
 
 ### `sample(resolution, potential)`
 
@@ -203,29 +204,60 @@ Params:
 Returns:
 * A merged `BinaryVolume` which is obtained by applying `r_func` to each field point-wise.
 
-### `union(a, b)`
+### `unite(a, b)`
 
-Approximately computes the set-theoretic union of two binary volumes.
-
-Params:
-* `a,b`: A pair of `BinaryVolume`s.
-
-Returns:
-* The pointwise union of `a` and `b`.
-
+Returns the set-theoretic union of `BinaryVolume`s `a` and `b`
 
 ### `intersect(a, b)`
 
+Returns the set-theoretic intersection of `BinaryVolume`s `a` and `b`.
+
 ### `subtract(a, b)`
+
+Returns the set-theoretic difference of `a - b`.
 
 ### `complement(a)`
 
-### `dilate(volume, kernel)`
+Returns the set-theoretic complement of `a`.
 
-### `erode(volume, kernel)`
+### `dilate(volume, stencil)`
+
+Dilates `volume` by the structuring element `stencil`
+
+### `erode(volume, stencil)`
+
+Erodes `volume` by the structuring element `stencil`.
+
+### `closing(volume, stencil)`
+
+Computes the morphological closing of a volume.  Equivalent to:
+
+    erode(dilate(volume, stencil), stencil)
+
+### `opening(volume, stencil)`
+
+Computes the morphological opening of a volume.  Equivalent to:
+
+    dilate(erode(volume, stencil), stencil)
 
 ### `labelComponents(volume)`
 
+Labels all of the connected components within a `BinaryVolume`
+
+Params:
+* `volume`:  The volume to label
+
+Returns: An object containing the following members:
+* `count`: The number of connected components.
+* `labels`: An array of integers with length equal `count` representing the label of each component.
+
 ### `splitComponents(volume, [labelStruct])`
 
+Separates a volume into each of its connected components.
 
+Params:
+* `volume`: The volume to segment
+* (optional) `labelStruct`: A structure containing the result of calling `labelComponents`.  If not present, this data is computed.
+
+Returns:
+* An array of binary volumes, each containing a different connected component of `volume`.

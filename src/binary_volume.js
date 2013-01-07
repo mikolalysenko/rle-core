@@ -315,7 +315,7 @@ function splitComponents(volume, label_struct) {
 //Subtract a function
 var SUBTRACT_FUNC   = new Function("a", "return Math.min(a[0],-a[1]);" )
   , INTERSECT_FUNC  = new Function("a", "return Math.min(a[0], a[1]);" )
-  , UNION_FUNC      = new Function("a", "return Math.max(a[0], a[1]);" )
+  , UNITE_FUNC      = new Function("a", "return Math.max(a[0], a[1]);" )
 
 //Expose interface
 exports.BinaryRun     = Run;
@@ -324,7 +324,7 @@ exports.sample        = sample;
 exports.merge         = merge;
 
 //Boolean set operations
-exports.union      = function(a, b) { return merge([a,b], UNION_FUNC); }
+exports.unite      = function(a, b) { return merge([a,b], UNITE_FUNC); }
 exports.intersect  = function(a, b) { return merge([a,b], INTERSECT_FUNC); }
 exports.subtract   = function(a, b) { return merge([a,b], SUBTRACT_FUNC); }
 exports.complement = function(a)    {
@@ -336,6 +336,13 @@ exports.complement = function(a)    {
   return new BinaryVolume(nruns);
 };
 
+exports.empty     = function() {
+  return new BinaryVolume([
+    new Run([NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY],-1.0)
+  ]);
+}
+
+
 //Morphological operations
 exports.dilate      = dilate;
 exports.erode       = erode;
@@ -345,13 +352,3 @@ exports.opening     = function(volume, stencil) { return dilate(erode(volume, st
 //Topological stuff
 exports.labelComponents = labelComponents;
 exports.splitComponents = splitComponents;
-
-//Empty volume constructor
-Object.defineProperty(exports, "EMPTY_VOLUME", {
-  get: function() {
-    return new BinaryVolume([
-      new Run([NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY],-1.0)
-    ]);
-  }
-});
-
