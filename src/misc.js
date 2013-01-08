@@ -2,7 +2,20 @@ var EPSILON             = 1e-6
   , POSITIVE_INFINITY   =  (1<<30)
   , NEGATIVE_INFINITY   = -(1<<30)
   , EDGE_TABLE          = new Array(256)  //List of 12-bit masks describing edge crossings
-  , CUBE_EDGES          = new Array(12)   //List of 12 edges of cube
+  , CUBE_EDGES          = [
+      [6, 7, 0]
+    , [5, 7, 1]
+    , [3, 7, 2]
+    , [0, 1, 0]
+    , [0, 2, 1]
+    , [0, 4, 2]
+    , [1, 3, 1]
+    , [1, 5, 2]
+    , [2, 3, 0]
+    , [2, 6, 2]
+    , [4, 5, 0]
+    , [4, 6, 1]
+  ]
   , MOORE_STENCIL       = [ [0,0,0] ]
   , SURFACE_STENCIL     = [ ]
   , VON_NEUMANN_STENCIL = [ ];
@@ -16,57 +29,52 @@ var compareCoord = new Function("ra", "rb", [
   "return 0;",
 ].join("\n"));
 
-
-//Build surface stencil
-for(var i=0; i<8; ++i) {
-  var p = [0,0,0];
-  for(var j=0; j<3; ++j) {
-    if((i & (1<<j)) !== 0) {
-      p[j] = -1;
-    }
-  }
-  SURFACE_STENCIL.push(p);
-}
-
-//Build Moore stencil
-for(var i=0; i<3; ++i) {
-  for(var s=-1; s<=1; s+=2) {
+(function() {
+  //Build surface stencil
+  for(var i=0; i<8; ++i) {
     var p = [0,0,0];
-    p[d] = s;
-    MOORE_STENCIL.push(p);
-  }
-}
-
-//Von Neumann stencil
-for(var dz=-1; dz<=1; ++dz)
-for(var dy=-1; dy<=1; ++dy)
-for(var dx=-1; dx<=1; ++dx) {
-  VON_NEUMANN_STENCIL.push([dx,dy,dz]);
-}
-
-var n = 0;
-for(var i=0; i<8; ++i) {
-  for(var d=0; d<3; ++d) {
-    var j = i ^ (1<<d);
-    if(j < i) {
-      continue;
+    for(var j=0; j<3; ++j) {
+      if((i & (1<<j)) !== 0) {
+        p[j] = -1;
+      }
     }
-    CUBE_EDGES[n] = [i, j, d];
-    ++n;
+    SURFACE_STENCIL.push(p);
   }
-}
+})();
 
-//Precalculate edge crossings
-for(var mask=0; mask<256; ++mask) {
-  var e_mask = 0;
-  for(var i=0; i<12; ++i) {
-    var e = CUBE_EDGES[i];
-    if(!(mask & (1<<e[0])) !== !(mask & (1<<e[1]))) {
-      e_mask |= (1<<i);
+(function() {
+  //Build Moore stencil
+  for(var i=0; i<3; ++i) {
+    for(var s=-1; s<=1; s+=2) {
+      var p = [0,0,0];
+      p[i] = s;
+      MOORE_STENCIL.push(p);
     }
-    EDGE_TABLE[mask] = e_mask;
   }
-}
+})();
+
+(function() {
+  //Von Neumann stencil
+  for(var dz=-1; dz<=1; ++dz)
+  for(var dy=-1; dy<=1; ++dy)
+  for(var dx=-1; dx<=1; ++dx) {
+    VON_NEUMANN_STENCIL.push([dx,dy,dz]);
+  }
+})();
+
+(function() {
+  //Precalculate edge crossings
+  for(var mask=0; mask<256; ++mask) {
+    var e_mask = 0;
+    for(var i=0; i<12; ++i) {
+      var e = CUBE_EDGES[i];
+      if(!(mask & (1<<e[0])) !== !(mask & (1<<e[1]))) {
+        e_mask |= (1<<i);
+      }
+      EDGE_TABLE[mask] = e_mask;
+    }
+  }
+})();
 
 //Bisect an interval
 function bisect(runs, lo, hi, coord) {

@@ -87,7 +87,7 @@ BinaryVolume.prototype.surface = function() {
         , u = vals[edge[0]]
         , v = vals[edge[1]]
         , d = edge[2];
-      centroid[d] += v / (u - v);
+      centroid[d] -= Math.min(1.0-EPSILON,Math.max(EPSILON, v / (v - u)));
       ++count;
     }
     //Compute vertex
@@ -99,24 +99,34 @@ BinaryVolume.prototype.surface = function() {
     //Append vertex
     positions.push(centroid);
     //Advance vertex pointers
+outer_loop:
     for(var i=0; i<8; ++i) {
-      var p = positions[v_ptr[i]];
-      for(var j=0; j<3; ++j) {
-        nc[j] = coord[j] - ((i&(1<<j)) ? 1 : 0);
-        nd[j] = Math.ceil(p[j]);
-      }
-      if(compareCoord(nc, nd) > 0) {
-        ++v_ptr[i];
+      while(true) {
+        if(v_ptr[i] >= positions.length -1) {
+          continue outer_loop;
+        }
+        var p = positions[v_ptr[i]+1];
+        for(var j=0; j<3; ++j) {
+          nc[j] = coord[j] - ((i&(1<<j)) ? 1 : 0);
+          nd[j] = Math.ceil(p[j]);
+        }
+        var s = compareCoord(nd, nc);
+        if(s <=0) {
+          ++v_ptr[i];
+        }
+        if(s >= 0) {
+          break;
+        }
       }
     }
     //Add faces
     for(var i=0; i<3; ++i) {
-      if((crossings & (1<<i)) === 0) {
+      if(!(crossings & (1<<i))) {
         continue;
       }
       var iu = 1<<((i+1)%3)
         , iv = 1<<((i+2)%3);
-      if(mask & 1) {
+      if(mask & 128) {
         faces.push([v_ptr[0],  v_ptr[iu], v_ptr[iv]]);
         faces.push([v_ptr[iv], v_ptr[iu], v_ptr[iu+iv]]);
       } else {
@@ -206,7 +216,7 @@ function dilate(volume, stencil) {
   return new BinaryVolume(nruns);
 }
 
-
+//Erode by a stencil
 function erode(volume, stencil) {
   var runs = volume.runs
     , nruns = [ new Run([NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY], nruns[0].value) ];
@@ -316,13 +326,17 @@ var SUBTRACT_FUNC   = new Function("a", "return Math.min(a[0],-a[1]);" )
   , INTERSECT_FUNC  = new Function("a", "return Math.min(a[0], a[1]);" )
   , UNITE_FUNC      = new Function("a", "return Math.max(a[0], a[1]);" )
 
-//Expose interface
+//Data structures
 exports.BinaryRun     = Run;
 exports.BinaryVolume  = BinaryVolume;
+
+//Create a volume
 exports.sample        = sample;
+
+//k-way tree merging
 exports.merge         = merge;
 
-//Boolean set operations
+//CSG
 exports.unite      = function(a, b) { return merge([a,b], UNITE_FUNC); }
 exports.intersect  = function(a, b) { return merge([a,b], INTERSECT_FUNC); }
 exports.subtract   = function(a, b) { return merge([a,b], SUBTRACT_FUNC); }
@@ -334,13 +348,11 @@ exports.complement = function(a)    {
   }
   return new BinaryVolume(nruns);
 };
-
 exports.empty     = function() {
   return new BinaryVolume([
     new Run([NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY],-1.0)
   ]);
 }
-
 
 //Morphological operations
 exports.dilate      = dilate;

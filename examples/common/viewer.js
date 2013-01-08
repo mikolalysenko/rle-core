@@ -1,7 +1,8 @@
-//Simple mesh viewer//Import libraries
+//Simple mesh viewer
 var $             = require('jquery-browserify')
   , GLOW          = require('./GLOW.js').GLOW
-  , utils         = require('./utils.js');
+  , utils         = require('./utils.js')
+  , trimesh       = require('trimesh');
 
 exports.makeViewer = function(params) {
 
@@ -14,9 +15,15 @@ exports.makeViewer = function(params) {
       "uniform     mat4     cameraProjection;",
       
       "attribute  vec3      position;",
+      "attribute  vec3      normal;",
+      
+      "varying    vec3      f_normal;",
+      "varying    vec3      f_position;",
       
       "void main(void) {",
         "gl_Position = cameraProjection * cameraInverse * transform * vec4( position, 1.0 );",
+        "f_normal = normal;",
+        "f_position = position;",
       "}"
     ].join("\n"),
     fragmentShader: [
@@ -24,18 +31,23 @@ exports.makeViewer = function(params) {
         "precision highp float;",
       "#endif",
       
+      "varying vec3 f_normal;",
+      "varying vec3 f_position;",
+      
       "void main() {",
-        "gl_FragColor = vec4(1, 1, 1, 1);",
+        "gl_FragColor = vec4((f_position - 10.0) + 0.01*f_normal, 1.0);",
       "}"
     ].join("\n"),
     data: {
       transform:        new GLOW.Matrix4(),
       cameraInverse:    GLOW.defaultCamera.inverse,
       cameraProjection: GLOW.defaultCamera.projection,
-      position:         new Float32Array([0,0,0,1,0,0,0,1,0])
+      position:         new Float32Array([0,0,0,1,0,0,0,1,0]),
+      normal:           new Float32Array([0,0,1,0,0,1,0,0,1])
     },
     interleave: {
-      position: false
+      position: false,
+      normal:   false
     },
     indices: new Uint16Array([0,1,2]),
     primitive: GL.TRIANGLES,
@@ -49,9 +61,12 @@ exports.makeViewer = function(params) {
     //Update elements
     var faces = params.faces;
     var elements = shell.shader.elements;
-    elements.length = faces.length;
+    elements.length = faces.length*3;
     GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, elements.elements);
     GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Uint16Array(utils.flatten(faces)), GL.DYNAMIC_DRAW);
+    
+    //Updates buffer data
+    shell.shader.normal.bufferData(new Float32Array(utils.flatten(trimesh.vertex_normals(params))));
     
     //Update buffer data
     shell.shader.position.bufferData(new Float32Array(utils.flatten(params.positions)), GL.DYNAMIC_DRAW);
