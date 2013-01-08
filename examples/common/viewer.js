@@ -18,12 +18,10 @@ exports.makeViewer = function(params) {
       "attribute  vec3      normal;",
       
       "varying    vec3      f_normal;",
-      "varying    vec3      f_position;",
       
       "void main(void) {",
         "gl_Position = cameraProjection * cameraInverse * transform * vec4( position, 1.0 );",
         "f_normal = normal;",
-        "f_position = position;",
       "}"
     ].join("\n"),
     fragmentShader: [
@@ -32,10 +30,9 @@ exports.makeViewer = function(params) {
       "#endif",
       
       "varying vec3 f_normal;",
-      "varying vec3 f_position;",
       
       "void main() {",
-        "gl_FragColor = vec4((f_position - 10.0) + 0.01*f_normal, 1.0);",
+        "gl_FragColor = vec4(0.5*f_normal+0.5, 1.0);",
       "}"
     ].join("\n"),
     data: {
