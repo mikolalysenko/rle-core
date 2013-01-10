@@ -1,88 +1,22 @@
-# API Overview #
-
-The library is split into several submodules which provide various features.  These are stored in various subobjects below the main library.  There are also some commonly used functions which are stored in the root namespace of the library.
-
-## Table of contents ##
-
-- [API Overview](#api-overview)
-	- [Table of contents](#table-of-contents)
-- [rle](#rle)
-	- [POSITIVE_INFINITY](#positive_infinity)
-	- [NEGATIVE_INFINITY](#negative_infinity)
-	- [compareCoord(a, b)](#comparecoorda-b)
-- [rle.iterators](#rleiterators)
-	- [createStencil(volume, stencil)](#createstencilvolume-stencil)
-	- [StencilIterator(volume, stencil, ptrs, coord)](#stenciliteratorvolume-stencil-ptrs-coord)
-		- [Members](#members)
-			- [volume](#volume)
-			- [stencil](#stencil)
-			- [ptrs](#ptrs)
-			- [coord](#coord)
-		- [Methods:](#methods)
-			- [clone()](#clone)
-			- [hasNext()](#hasnext)
-			- [next()](#next)
-			- [nextCoord()](#nextcoord)
-			- [seek(ncoord)](#seekncoord)
-	- [createMultiStencil(volumes, stencil)](#createmultistencilvolumes-stencil)
-	- [MultiIterator(volumes, stencil, ptrs, coord)](#multiiteratorvolumes-stencil-ptrs-coord)
-		- [Members](#members-1)
-			- [volumes](#volumes)
-			- [stencil](#stencil-1)
-			- [ptrs](#ptrs-1)
-			- [coord](#coord-1)
-		- [Methods](#methods-1)
-			- [clone()](#clone-1)
-			- [subiterator(n)](#subiteratorn)
-			- [hasNext()](#hasnext-1)
-			- [next()](#next-1)
-			- [nextCoord()](#nextcoord-1)
-			- [seek(coord)](#seekcoord)
-- [rle.stencils](#rlestencils)
-	- [SURFACE](#surface)
-	- [MOORE](#moore)
-	- [VON_NEUMANN](#von_neumann)
-- [rle.binary](#rlebinary)
-	- [BinaryRun(coord, value)](#binaryruncoord-value)
-		- [Members](#members-2)
-			- [coord](#coord-2)
-			- [value](#value)
-	- [BinaryVolume(runs)](#binaryvolumeruns)
-		- [Members](#members-3)
-			- [runs](#runs)
-		- [Methods](#methods-2)
-			- [clone()](#clone-2)
-			- [testPoint(point)](#testpointpoint)
-			- [testPointList(point_list)](#testpointlistpoint_list)
-			- [surface()](#surface-1)
-	- [empty()](#empty)
-	- [sample(resolution, potential)](#sampleresolution-potential)
-	- [merge(volumes, r_func)](#mergevolumes-r_func)
-	- [unite(a, b)](#unitea-b)
-	- [intersect(a, b)](#intersecta-b)
-	- [subtract(a, b)](#subtracta-b)
-	- [complement(a)](#complementa)
-	- [dilate(volume, stencil)](#dilatevolume-stencil)
-	- [erode(volume, stencil)](#erodevolume-stencil)
-	- [closing(volume, stencil)](#closingvolume-stencil)
-	- [opening(volume, stencil)](#openingvolume-stencil)
-	- [labelComponents(volume)](#labelcomponentsvolume)
-	- [splitComponents(volume, [labelStruct])](#splitcomponentsvolume-labelstruct)
+# API #
 
 
-# `rle` #
+# `Run(coord, value)` #
 
-The root namespace for library.  Contains constants and common methods for operating on runs.
+A tuple consisting of a pair of elements `coord` and `value` representing the coordinate 
 
-## `POSITIVE_INFINITY`
+# Volume(runs) #
 
-Upper bound for coordinate system
+A sorted list of runs representing a narrowband level set.  Must have the property that every voxel near the surface is contained within a radius 1 von Neumann neighborhood.
 
-## `NEGATIVE_INFINITY`
+## Members:
 
-Lower bound for coordinate system
+### `clone()`
 
-## `compareCoord(a, b)`
+### `testPoint(point)`
+
+
+# `compareCoord(a, b)` #
 
 Compares a pair of 3D vectors colexicographically to recover relative ranking.
 

@@ -9,8 +9,8 @@ var compareCoord      = misc.compareCoord
 var StencilIterator = require("./stencil_iterator.js").StencilIterator;
 
 //Multivolume iterator
-function MultiIterator(volumes, stencil, ptrs, coord) {
-  this.volumes  = volumes;
+function MultiIterator(runs, stencil, ptrs, coord) {
+  this.runs     = runs;
   this.stencil  = stencil;
   this.ptrs     = ptrs;
   this.coord    = coord;
@@ -23,7 +23,7 @@ MultiIterator.prototype.clone = function() {
     ptrs[i] = this.ptrs[i].slice(0);
   }
   return new MultiIterator(
-    this.volumes,
+    this.runs,
     this.stencil,
     ptrs,
     this.coord.slice(0)
@@ -33,7 +33,7 @@ MultiIterator.prototype.clone = function() {
 //Extract an individual component of this iterator
 MultiIterator.prototype.subiterator = function(i) {
   return new StencilIterator(
-    this.volumes[i],
+    this.runs[i],
     this.stencil,
     this.ptrs[i].slice(0),
     this.coord.slice(0)
@@ -47,7 +47,7 @@ MultiIterator.prototype.hasNext = function() {
 
 //Compute next coordinate of multi iterator
 MultiIterator.prototype.nextCoord_rv = function(ncoord) {
-  var volumes = this.volumes
+  var volumes = this.runs
     , stencil = this.stencil
     , coord   = this.coord
     , v_ptrs  = this.ptrs
@@ -56,8 +56,8 @@ MultiIterator.prototype.nextCoord_rv = function(ncoord) {
   for(var i=0; i<3; ++i) {
     ncoord[i] = POSITIVE_INFINITY;
   }
-  for(var i=0; i<volumes.length; ++i) {
-    var runs = volumes[i].runs
+  for(var i=0; i<runs.length; ++i) {
+    var runs = volumes[i]
       , ptrs = v_ptrs[i];
     for(var j=0; j<stencil.length; ++j) {
       if(ptrs[j] >= runs.length - 1) {
@@ -86,7 +86,7 @@ MultiIterator.prototype.nextCoord = function() {
 
 //Advance to next coordinate
 MultiIterator.prototype.next = function() {
-  var volumes = this.volumes
+  var volumes = this.runs
     , stencil = this.stencil
     , coord   = this.coord;
   
@@ -126,7 +126,7 @@ MultiIterator.prototype.seek = function(coord) {
 //Perform a multiway iteration over a collection of volumes
 function createMultiStencil(volumes, stencil) {
   return new MultiIterator(
-    volumes,
+    runs,
     stencil,
     ptrs,
     [NEGATIVE_INFINITY,NEGATIVE_INFINITY,NEGATIVE_INFINITY]

@@ -8,8 +8,8 @@ var compareCoord      = misc.compareCoord
   , NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
 
 //Walk a stencil over a volume
-function StencilIterator(volume, stencil, ptrs, coord) {
-  this.volume     = volume;
+function StencilIterator(runs, stencil, ptrs, coord) {
+  this.runs     = runs;
   this.stencil    = stencil;
   this.ptrs       = ptrs;
   this.coord      = coord;
@@ -18,7 +18,7 @@ function StencilIterator(volume, stencil, ptrs, coord) {
 //Make a copy of this iterator
 StencilIterator.prototype.clone = function() {
   return new StencilIterator(
-      this.volume
+      this.runs
     , this.stencil
     , this.ptrs.slice(0)
     , this.coord.slice(0)
@@ -32,7 +32,7 @@ StencilIterator.prototype.hasNext = function() {
 
 //Compute next coordinate with input return value
 StencilIterator.prototype.nextCoord_rv = function(ncoord) {
-  var runs    = this.volume.runs
+  var runs    = this.runs
     , stencil = this.stencil
     , ptrs    = this.ptrs
     , tcoord  = [0,0,0];
@@ -66,7 +66,7 @@ StencilIterator.prototype.nextCoord = function() {
 
 //Advance iterator one position
 StencilIterator.prototype.next = function() {
-  var runs    = this.volume.runs
+  var runs    = this.runs
     , stencil = this.stencil
     , ptrs    = this.ptrs
     , coord   = this.coord;
@@ -97,7 +97,7 @@ outer_loop:
 
 //Seek to target coordinate
 StencilIterator.prototype.seek = function(coord) {
-  var runs    = this.volume.runs
+  var runs    = this.runs
     , ptrs    = this.ptrs
     , stencil = this.stencil
     , tcoord  = [0,0,0];

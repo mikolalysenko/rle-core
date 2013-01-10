@@ -7,15 +7,19 @@ exports.compareCoord      = misc.compareCoord;
 //Stencils
 exports.stencils = require("./stencils.js");
 
-//Iterators
-var stencil   = require("./stencil_iterator.js")
-  , multi     = require("./multi_iterator.js");
-exports.iterators = {
-    StencilIterator:    stencil.StencilIterator
-  , createStencil:      stencil.createStencil
-  , MultiIterator:      multi.MultiIterator
-  , createMultiStencil: multi.createMultiStencil
-};
+//Basic volume processing stuff
+var volume = require("./volume.js");
+exports.Run     = volume.run;
+exports.Volume  = volume.Volume;
+exports.sample  = volume.sample;
 
-//Binary volumes
-exports.binary  = require("./binary_volume.js");
+//Surface extraction
+exports.surface = require("./surface.js").surface;
+
+//In place updates and morphological processing
+var map = require("./map.js");
+exports.map       = map.map;
+exports.dilate    = map.dilate;
+exports.erode     = map.erode;
+exports.opening   = map.opening;
+exports.closing   = map.closing;
