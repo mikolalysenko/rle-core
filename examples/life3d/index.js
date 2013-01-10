@@ -7,34 +7,24 @@ var neighborhood = rle.stencils.vonNeumann(1);
 var BinaryRun = rle.binary.BinaryRun;
 
 function step(volume) {
-  var next_runs   = []
-    , runs        = volume.runs
-    , prev_value  = 0;
-  for(var iter=rle.iterators.createStencil(volume, neighborhood); iter.hasNext(); iter.next()) {
+  return rle.binary.map(volume, neighborhood, function(values) {
     //Count neighbors
     var neighbors = 0;
     for(var i=0; i<27; ++i) {
-      var r = runs[iter.ptrs[i]];
-      if(r.value >= 0) {
+      if(values[i] >= 0) {
         ++neighbors;
       }
     }
     //Compute next state
-    var next_value = -1;
-    if(runs[iter.ptrs[1+3+9]].value >= 0) {
-      if(8 <= neighbors && neighbors <= 13) {
-        next_value = 1;
+    if(values[1+3+9] >= 0) {
+      if(10 <= neighbors && neighbors <= 13) {
+        return 1;
       }
-    } else if(7 <= neighbors && neighbors <= 10) {
-      next_value = 1;
+    } else if(9 <= neighbors && neighbors <= 10) {
+      return 1;
     }
-    //Add to list
-    if(next_value !== prev_value) {
-      next_runs.push(new BinaryRun(iter.coord.slice(0), next_value));
-      prev_value = next_value;
-    }
-  }
-  return new rle.binary.BinaryVolume(next_runs);
+    return -1;
+  });
 }
 
 
@@ -43,7 +33,7 @@ $(document).ready(function() {
   var viewer = require("../common/viewer.js").makeViewer();
   
   //Create a volume
-  var state = rle.binary.sample([-16,-16,-16], [16,16,16], examples.noise);
+  var state = rle.binary.sample([-16,-16,-16], [16,16,16], examples.box);
   
   setInterval(function() {
     state = step(state);

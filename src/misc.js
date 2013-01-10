@@ -52,9 +52,6 @@ var compareCoord = new Function("ra", "rb", [
   }
 })();
 
-(function() {
-  //Construct cube edges
-})();
 
 (function() {
   //Precalculate edge crossings
@@ -75,9 +72,9 @@ function bisect(runs, lo, hi, coord) {
   while (lo < hi) {
     var mid = (lo + hi) >> 1
       , s = compareCoord(runs[mid].coord, coord);
-    if(s > 0) {
+    if(s < 0) {
       lo = mid + 1;
-    } else if(s < 0) {
+    } else if(s > 0) {
       hi = mid - 1;
     } else {
       return mid;

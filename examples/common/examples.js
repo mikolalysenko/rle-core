@@ -8,10 +8,10 @@ exports.sphere = new Function("x",
 
 
 exports.noise = function(x) {
-  var n = Math.floor(x[0]) + Math.floor(x[1]) * 57;
+  var n = Math.floor(x[0]) + Math.floor(x[1]) * 57 + Math.floor(x[2]) * 8917;
   n = (n << 13) ^ n;
   n = (n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff;
-  if(n > 0xffff) {
+  if(n > 0x6ffffff) {
     return 1;
   } else {
     return -1;

@@ -56,8 +56,50 @@ BinaryVolume.prototype.testPoint = function(point) {
   return false;
 }
 
+//Clean up unneeded runs
+BinaryVolume.prototype.cleanup = function() {
+  var dead_runs = []
+    , runs      = this.runs;
+
+outer_loop:
+  for(var iter=createStencil(this, CROSS_STENCIL); iter.hasNext(); iter.next()) {
+    var r = runs[iter.ptrs[0]];
+    for(var i=0; i<3; ++i) {
+      if(iter.coord[i] !== r.coord[i]) {
+        continue outer_loop;
+      }
+    }
+    var s = r.value < 0;
+    for(var i=1; i<7; ++i) {
+      if(s !== (runs[iter.ptrs[i]].value < 0)) {
+        dead_runs.push(iter.ptrs[0]);
+        continue outer_loop;
+      }
+    }
+  }
+  
+  //Remove dead runs
+  if(dead_runs.length > 0) {
+    var ptr = dead_runs[0];
+    for(var i=0; i<dead_runs.length; ++i) {
+      var l = dead_runs[i]+1
+        , h = i < dead_runs.length-1 ? dead_runs[i+1] : runs.length;
+      for(var j=l+1; j<h; ++j) {
+        var s = runs[ptr++]
+          , t = runs[j];
+        for(var k=0; k<3; ++k) {
+          s.coord[k] = t.coord[k];
+        }
+        s.value = t.value;
+      }
+    }
+    runs.length = runs.length - dead_runs.length;
+  }
+}
+
+
 //Extracts a surface from the volume using elastic surface nets
-BinaryVolume.prototype.surface = function() {
+BinaryVolume.prototype.surface = function(lo, hi) {
   var positions = []
     , faces     = []
     , runs      = this.runs
@@ -65,7 +107,32 @@ BinaryVolume.prototype.surface = function() {
     , v_ptr     = [0,0,0,0,0,0,0,0]
     , nc        = [0,0,0]
     , nd        = [0,0,0];
-  for(var iter=createStencil(this, SURFACE_STENCIL); iter.hasNext(); iter.next()) {
+  
+  if(!lo) {
+    lo = [NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY];
+  }
+  if(!hi) {
+    hi = [POSITIVE_INFINITY, POSITIVE_INFINITY, POSITIVE_INFINITY];
+  }
+
+  var iter = createStencil(this, SURFACE_STENCIL);
+  iter.seek(lo);
+
+main_loop:
+  for(; iter.hasNext(); iter.next()) {
+  
+    //Skip coordinates outside range
+    var coord = iter.coord;
+    for(var i=0; i<3; ++i) {
+      if(coord[i] < lo[i] || coord[i] >= hi[i]) {
+        continue main_loop;
+      }
+    }
+    //Exit if we are out of bounds
+    if(compareCoord(hi, coord) <= 0) {
+      break;
+    }
+  
     //Read in values and mask
     var ptrs = iter.ptrs
       , mask = 0;
@@ -95,7 +162,6 @@ BinaryVolume.prototype.surface = function() {
           centroid[j] -= 1.0-EPSILON;
         }
       }
-      
       centroid[d] -= Math.min(1.0-EPSILON,Math.max(EPSILON, u / (u - v)));
       ++count;
     }
@@ -128,6 +194,14 @@ outer_loop:
         }
       }
     }
+    
+    //Check if face in bounds
+    for(var i=0; i<3; ++i) {
+      if(coord[i] <= lo[i]) {
+        continue main_loop;
+      }
+    }
+    
     //Add faces
     for(var i=0; i<3; ++i) {
       if(!(crossings & (1<<i))) {
@@ -209,6 +283,24 @@ function merge(volumes, merge_func) {
   return new BinaryVolume(merged_runs);
 }
 
+//Applies a map to the volume
+function map(volume, stencil, func) {
+  var values = new Array(stencil.length)
+    , runs = volume.runs
+    , nruns = [];
+
+  for(var iter=createStencil(volume, stencil); iter.hasNext(); iter.next()) {
+    for(var i=0; i<stencil.length; ++i) {
+      values[i] = runs[iter.ptrs[i]].value;
+    }
+    nruns.push(new Run(iter.coord.slice(0), func(values)));
+  }
+  
+  var nv = new BinaryVolume(nruns);
+  nv.cleanup();
+  return nv;
+}
+
 //Dilate by fixed stencil
 function dilate(volume, stencil) {
   var runs = volume.runs
@@ -240,6 +332,7 @@ function erode(volume, stencil) {
   }
   return new BinaryVolume(nruns);
 }
+
 
 //Extracts all connected components of the volume
 function labelComponents(volume) {
@@ -339,6 +432,9 @@ exports.BinaryVolume  = BinaryVolume;
 
 //Create a volume
 exports.sample        = sample;
+
+//Apply a function pointwise to the entire volume
+exports.map           = map;
 
 //k-way tree merging
 exports.merge         = merge;
