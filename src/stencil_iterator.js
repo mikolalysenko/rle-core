@@ -18,10 +18,10 @@ function StencilIterator(volume, stencil, ptrs, coord) {
 //Make a copy of this iterator
 StencilIterator.prototype.clone = function() {
   return new StencilIterator(
-      volume
-    , stencil
-    , ptrs.slice(0)
-    , coord.slice(0)
+      this.volume
+    , this.stencil
+    , this.ptrs.slice(0)
+    , this.coord.slice(0)
   );
 }
 

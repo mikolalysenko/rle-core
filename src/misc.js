@@ -16,9 +16,8 @@ var EPSILON             = 1e-6
     , [4, 5, 0]
     , [4, 6, 1]
   ]
-  , MOORE_STENCIL       = [ [0,0,0] ]
-  , SURFACE_STENCIL     = [ ]
-  , VON_NEUMANN_STENCIL = [ ];
+  , CROSS_STENCIL       = [ [0,0,0] ]
+  , SURFACE_STENCIL     = [ ];
 
 //Compare two runs
 var compareCoord = new Function("ra", "rb", [
@@ -48,18 +47,13 @@ var compareCoord = new Function("ra", "rb", [
     for(var s=-1; s<=1; s+=2) {
       var p = [0,0,0];
       p[i] = s;
-      MOORE_STENCIL.push(p);
+      CROSS_STENCIL.push(p);
     }
   }
 })();
 
 (function() {
-  //Von Neumann stencil
-  for(var dz=-1; dz<=1; ++dz)
-  for(var dy=-1; dy<=1; ++dy)
-  for(var dx=-1; dx<=1; ++dx) {
-    VON_NEUMANN_STENCIL.push([dx,dy,dz]);
-  }
+  //Construct cube edges
 })();
 
 (function() {
@@ -99,6 +93,5 @@ exports.POSITIVE_INFINITY = POSITIVE_INFINITY;
 exports.NEGATIVE_INFINITY = NEGATIVE_INFINITY;
 exports.EDGE_TABLE        = EDGE_TABLE;
 exports.CUBE_EDGES        = CUBE_EDGES;
-exports.MOORE_STENCIL     = MOORE_STENCIL;
+exports.CROSS_STENCIL     = CROSS_STENCIL;
 exports.SURFACE_STENCIL   = SURFACE_STENCIL;
-exports.VON_NEUMANN_STENCIL = VON_NEUMANN_STENCIL;

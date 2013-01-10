@@ -5,11 +5,7 @@ exports.NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
 exports.compareCoord      = misc.compareCoord;
 
 //Stencils
-exports.stencils = {
-    MOORE:        misc.MOORE_STENCIL
-  , SURFACE:      misc.SURFACE_STENCIL
-  , VON_NEUMANN:  misc.VON_NEUMANN_STENCIL
-};
+exports.stencils = require("./stencils.js");
 
 //Iterators
 var stencil   = require("./stencil_iterator.js")

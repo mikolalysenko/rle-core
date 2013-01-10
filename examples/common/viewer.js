@@ -47,7 +47,7 @@ exports.makeViewer = function(params) {
       normal:   false
     },
     indices: new Uint16Array([0,1,2]),
-    primitive: GL.TRIANGLES,
+    primitives: GL.LINES,
     usage:     GL.DYNAMIC_DRAW
   };
   
@@ -55,6 +55,9 @@ exports.makeViewer = function(params) {
   
   //Update mesh
   shell.updateMesh = function(params) {
+  
+    console.log("Vertex count:", params.positions.length, "Face count:", params.faces.length);
+  
     //Update elements
     var faces = params.faces;
     var elements = shell.shader.elements;

@@ -1,5 +1,7 @@
 "use strict"; "use restrict";
 
+var assert = require("assert");
+
 var misc = require("./misc.js")
   , DisjointSet = require("./disjoint_set.js").DisjointSet;
 
@@ -10,7 +12,7 @@ var compareCoord      = misc.compareCoord
   , NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY
   , EDGE_TABLE        = misc.EDGE_TABLE
   , CUBE_EDGES        = misc.CUBE_EDGES
-  , MOORE_STENCIL     = misc.MOORE_STENCIL
+  , CROSS_STENCIL     = misc.CROSS_STENCIL
   , SURFACE_STENCIL   = misc.SURFACE_STENCIL;
 
 //Import iterators
@@ -84,10 +86,17 @@ BinaryVolume.prototype.surface = function() {
         continue;
       }
       var edge = CUBE_EDGES[i]
-        , u = vals[edge[0]]
+        , eu = edge[0]
+        , u = vals[eu]
         , v = vals[edge[1]]
         , d = edge[2];
-      centroid[d] -= Math.min(1.0-EPSILON,Math.max(EPSILON, v / (v - u)));
+      for(var j=0; j<3; ++j) {
+        if(eu & (1<<j)) {
+          centroid[j] -= 1.0-EPSILON;
+        }
+      }
+      
+      centroid[d] -= Math.min(1.0-EPSILON,Math.max(EPSILON, u / (u - v)));
       ++count;
     }
     //Compute vertex
@@ -142,14 +151,14 @@ outer_loop:
 }
 
 //Sample a volume
-function sample(dims, density_func) {
-  var x       = [ 0, 0, 0 ]
+function sample(lo, hi, density_func) {
+  var x       = lo.slice(0)
     , y       = [ 0, 0, 0 ]
-    , runs    = [ new Run([NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY], density_func(x)) ];
+    , runs    = [ new Run([NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY], -1) ];
   //March over the volume
-  for(x[2]=0; x[2]<dims[2]; ++x[2]) {
-    for(x[1]=0; x[1]<dims[1]; ++x[1]) {
-      for(x[0]=0; x[0]<dims[0]; ++x[0]) {
+  for(x[2]=lo[2]; x[2]<hi[2]; ++x[2]) {
+    for(x[1]=lo[1]; x[1]<hi[1]; ++x[1]) {
+      for(x[0]=lo[0]; x[0]<hi[0]; ++x[0]) {
         //Get field and sign value
         var rho   = density_func(x)
           , s_rho = rho < 0;
@@ -158,7 +167,7 @@ function sample(dims, density_func) {
         y[2] = x[2];
 outer_loop:
         for(var d=0; d<3; ++d) {
-          for(var s=-1; s<=1; ++s) {
+          for(var s=-1; s<=1; s+=2) {
             y[d] += s;
             //Check if signs are consistent
             if(s_rho !== (density_func(y) < 0)) {
@@ -179,7 +188,7 @@ outer_loop:
 function merge(volumes, merge_func) {
   var merged_runs = []
     , values      = new Array(volumes.length);
-  for(var iter = createMultiStencil(volumes, MOORE_STENCIL); iter.hasNext(); iter.next()) {
+  for(var iter = createMultiStencil(volumes, CROSS_STENCIL); iter.hasNext(); iter.next()) {
   
     for(var i=0; i<values.length; ++i) {
       values[i] = volumes[i].runs[iter.ptrs[i][0]].value;
@@ -287,7 +296,7 @@ function splitComponents(volume, label_struct) {
     components[i] = [ ];
   }
   var runs = volume.runs;
-  for(var iter=createStencil(volume, MOORE_STENCIL); iter.hasNext(); iter.next()) {
+  for(var iter=createStencil(volume, CROSS_STENCIL); iter.hasNext(); iter.next()) {
     var ptrs    = iter.ptrs
       , center  = runs[ptrs[0]];
     if(center.value < 0) {
@@ -318,8 +327,6 @@ function splitComponents(volume, label_struct) {
   }
   return volumes;
 }
-
-
 
 //Subtract a function
 var SUBTRACT_FUNC   = new Function("a", "return Math.min(a[0],-a[1]);" )

@@ -5,7 +5,7 @@ var $         = require("jquery-browserify")
 $(document).ready(function() {
 
   //Create a volume
-  var volume = rle.binary.sample([32,32,32], examples.box);
+  var volume = rle.binary.sample([-8,-8,-8], [8,8,8], examples.sphere);
   
   //Create viewer
   var viewer = require("../common/viewer.js").makeViewer();

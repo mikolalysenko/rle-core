@@ -226,11 +226,11 @@ A 2x2x2 cube stencil:
       [-1,-1,-1]
     ];
 
-## `MOORE`
+## `VON_NEUMANN`
 
 A stencil representing the Moore neighborhood of a point:
 
-    MOORE = [
+    VON_NEUMANN = [
       [ 0, 0, 0],
       [-1, 0, 0],
       [ 1, 0, 0],
@@ -240,15 +240,15 @@ A stencil representing the Moore neighborhood of a point:
       [ 0, 0, 1]
     ];
 
-## `VON_NEUMANN`
+## `MOORE`
 
 A 3x3x3 cube centered at [0,0,0]:
 
-    VON_NEUMANN = [];
+    MOORE = [];
     for(var dz=-1; dz<=1; ++dz)
     for(var dy=-1; dy<=1; ++dy)
     for(var dx=-1; dx<=1; ++dx) {
-      VON_NEUMANN.push([dx,dy,dz]);
+      MOORE.push([dx,dy,dz]);
     }
 
 
@@ -300,10 +300,11 @@ Extracts a mesh from the binary volume using surface nets
 
 Creates an empty volume object
 
-## `sample(resolution, potential)`
+## `sample(lo, hi, potential)`
 
 Params:
-* `resolution`: A length 3 array of integers representing the resolution at which to sample.
+* `lo`: A 3D vector of integers giving the coordinates of the volume
+* `hi`: A 3D vector of upper bounds
 * `potential`: A function taking a 3D vector as input that returns an approximation of the signed distance field of some solid object.
 
 Returns:
