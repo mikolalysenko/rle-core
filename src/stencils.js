@@ -1,6 +1,6 @@
 var compareCoord = require("./misc.js").compareCoord;
 
-exports.moore = function(radius) {
+exports.mooreStencil = function(radius) {
   var result = [];
   for(var i=-radius; i<=radius; ++i) {
     for(var j=-radius; j<=radius; ++j) {
@@ -13,7 +13,7 @@ exports.moore = function(radius) {
   return result;
 }
 
-exports.vonNeumann = function(radius) {
+exports.vonNeumannStencil = function(radius) {
   var result = [];
   for(var i=-radius; i<=radius; ++i) {
     for(var j=-radius; j<=radius; ++j) {
@@ -28,7 +28,7 @@ exports.vonNeumann = function(radius) {
   return result;
 }
 
-exports.sphere = function(radius) {
+exports.ballStencil = function(radius) {
   var result = [];
   for(var i=-radius; i<=radius; ++i) {
     for(var j=-radius; j<=radius; ++j) {

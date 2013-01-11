@@ -5,21 +5,39 @@ exports.NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
 exports.compareCoord      = misc.compareCoord;
 
 //Stencils
-exports.stencils = require("./stencils.js");
+var stencils = require("./stencils.js");
+exports.mooreStencil      = stencils.mooreStencil;
+exports.vonNeumannStencil = stencils.vonNeumannStencil;
+exports.ballStencil       = stencils.ballStencil;
 
-//Basic volume processing stuff
+//Basic data types
 var volume = require("./volume.js");
 exports.Run     = volume.run;
 exports.Volume  = volume.Volume;
-exports.sample  = volume.sample;
+exports.empty   = volume.empty;
+
+//Sampling
+exports.sample  = require("./sample.js").sample;
 
 //Surface extraction
 exports.surface = require("./surface.js").surface;
 
 //In place updates and morphological processing
-var map = require("./map.js");
-exports.map       = map.map;
-exports.dilate    = map.dilate;
-exports.erode     = map.erode;
-exports.opening   = map.opening;
-exports.closing   = map.closing;
+exports.apply = require("./apply.js").apply;
+
+//Merging of multiple volumes
+exports.merge = require("./merge.js").merge;
+
+//Morphology
+var morphology = require("./morphology.js");
+exports.dilate    = morphology.dilate;
+exports.erode     = morphology.erode;
+exports.opening   = morphology.opening;
+exports.closing   = morphology.closing;
+
+//Constructive solid geometry
+var csg = require("./csg.js");
+exports.unite       = csg.unite;
+exports.intersect   = csg.intersect;
+exports.subtract    = csg.subtract;
+exports.complement  = csg.complement;

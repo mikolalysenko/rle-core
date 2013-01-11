@@ -4,11 +4,11 @@ var $         = require("jquery-browserify")
 
 $(document).ready(function() {
 
-  //Create a volume
-  var volume = rle.binary.sample([-8,-8,-8], [8,8,8], examples.noise);
-  
   //Create viewer
   var viewer = require("../common/viewer.js").makeViewer();
-  viewer.updateMesh(volume.surface([-5, -5, -5], [5,5,5]));
+  
+  //Create a volume
+  var volume = rle.sample([-8,-8,-8], [9,9,9], examples.sphere);
+  viewer.updateMesh(rle.surface(volume));
   
 });

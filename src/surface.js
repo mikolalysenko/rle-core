@@ -1,8 +1,53 @@
+
+//Import stuff from misc.js
+var misc = require("./misc.js");
+var NEGATIVE_INFINITY     = misc.NEGATIVE_INFINITY
+  , POSITIVE_INFINITY     = misc.POSITIVE_INFINITY
+  , EPSILON               = misc.EPSILON
+  , SURFACE_STENCIL       = misc.SURFACE_STENCIL
+  , compareCoord          = misc.compareCoord;
+
+//Import stuff from stencil iterator
+var createStencil = require("./stencil_iterator.js").createStencil;
+
+//A table of cube edges
+var CUBE_EDGES = [
+      [6, 7, 0]
+    , [5, 7, 1]
+    , [3, 7, 2]
+    , [0, 1, 0]
+    , [0, 2, 1]
+    , [0, 4, 2]
+    , [1, 3, 1]
+    , [1, 5, 2]
+    , [2, 3, 0]
+    , [2, 6, 2]
+    , [4, 5, 0]
+    , [4, 6, 1]
+  ];
+
+//List of 12-bit masks describing edge crossings
+var EDGE_TABLE = new Array(256);
+(function() {
+  //Precalculate edge crossings
+  for(var mask=0; mask<256; ++mask) {
+    var e_mask = 0;
+    for(var i=0; i<12; ++i) {
+      var e = CUBE_EDGES[i];
+      if(!(mask & (1<<e[0])) !== !(mask & (1<<e[1]))) {
+        e_mask |= (1<<i);
+      }
+      EDGE_TABLE[mask] = e_mask;
+    }
+  }
+})();
+
+
 //Extracts a surface from the volume using elastic surface nets
-BinaryVolume.prototype.surface = function(lo, hi) {
+function surface(volume, lo, hi) {
   var positions = []
     , faces     = []
-    , runs      = this.runs
+    , runs      = volume.runs
     , vals      = [0,0,0,0,0,0,0,0]
     , v_ptr     = [0,0,0,0,0,0,0,0]
     , nc        = [0,0,0]
@@ -15,7 +60,7 @@ BinaryVolume.prototype.surface = function(lo, hi) {
     hi = [POSITIVE_INFINITY, POSITIVE_INFINITY, POSITIVE_INFINITY];
   }
 
-  var iter = createStencil(this, SURFACE_STENCIL);
+  var iter = createStencil(volume, SURFACE_STENCIL);
   iter.seek(lo);
 
 main_loop:
@@ -123,3 +168,5 @@ outer_loop:
     faces:     faces
   };
 }
+
+exports.surface = surface;
