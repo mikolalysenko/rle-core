@@ -4,6 +4,8 @@ var Run     = volume.Run
 
 var createStencil = require("./stencil_iterator.js").createStencil;
 
+var cleanup = require("./repair.js").cleanup;
+
 //Applies a map to the volume
 function apply(volume, stencil, func) {
   var values = new Array(stencil.length)
@@ -14,11 +16,11 @@ function apply(volume, stencil, func) {
     for(var i=0; i<stencil.length; ++i) {
       values[i] = runs[iter.ptrs[i]].value;
     }
-    nruns.push(new Run(iter.coord.slice(0), func(values)));
+    nruns.push(new Run(iter.coord.slice(0),  func(values) ));
   }
   
   var nv = new Volume(nruns);
-  nv.cleanup();
+  cleanup(nv);
   return nv;
 }
 

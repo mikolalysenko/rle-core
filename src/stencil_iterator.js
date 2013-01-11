@@ -7,12 +7,27 @@ var compareCoord      = misc.compareCoord
   , POSITIVE_INFINITY = misc.POSITIVE_INFINITY
   , NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
 
+var POINTER_LIST = new Array(128);
+(function(){
+for(var i=0; i<128; ++i) {
+  POINTER_LIST[i] = 0;
+}
+})();
+
 //Walk a stencil over a volume
 function StencilIterator(volume, stencil, ptrs, coord) {
   this.volume     = volume;
   this.stencil    = stencil;
   this.ptrs       = ptrs;
   this.coord      = coord;
+  
+  //Resize internal buffer
+  if(POINTER_LIST.length < stencil.length) {
+    POINTER_LIST.length = stencil.length;
+    for(var i=0; i<POINTER_LIST.length; ++i) {
+      POINTER_LIST[i] = 0;
+    }
+  }
 }
 
 //Make a copy of this iterator
@@ -30,9 +45,10 @@ StencilIterator.prototype.hasNext = function() {
   return this.coord[0] < POSITIVE_INFINITY;
 }
 
-//Compute next coordinate with input return value
-StencilIterator.prototype.nextCoord_rv = function(ncoord) {
-  var runs    = this.volume.runs
+//Compute next coordinate
+StencilIterator.prototype.nextCoord = function() {
+  var ncoord = [0,0,0]
+    , runs    = this.volume.runs
     , stencil = this.stencil
     , ptrs    = this.ptrs
     , tcoord  = [0,0,0];
@@ -57,24 +73,22 @@ StencilIterator.prototype.nextCoord_rv = function(ncoord) {
   return ncoord;
 }
 
-//Compute next coordinate
-StencilIterator.prototype.nextCoord = function() {
-  var ncoord = [0,0,0];
-  this.nextCoord_rv(ncoord);
-  return ncoord;
-}
 
 //Advance iterator one position
 StencilIterator.prototype.next = function() {
   var runs    = this.volume.runs
     , stencil = this.stencil
     , ptrs    = this.ptrs
-    , coord   = this.coord;
+    , coord   = this.coord
+    , tcoord  = [0,0,0]
+    , n       = 0;
   
-  //Compute next coordinate
-  this.nextCoord_rv(coord);
+  //Push coordinate to infinity
+  for(var i=0; i<3; ++i) {
+    coord[i] = POSITIVE_INFINITY;
+  }
   
-  //Advance to next coordinate
+  //Loop through runs, find maximum pointer
 outer_loop:
   for(var i=0; i<stencil.length; ++i) {
     if(ptrs[i] >= runs.length-1) {
@@ -83,15 +97,26 @@ outer_loop:
     var nr = runs[ptrs[i]+1].coord
       , delta = stencil[i];
     for(var j=2; j>=0; --j) {
-      var t = nr[j] - delta[j];
-      if(t < coord[j]) {
-        break;
-      } else if(t > coord[j]) {
+      var t = nr[j] - delta[j]
+        , u = coord[j];
+      if(t < u) {
+        coord[j--] = t;
+        for(; j>=0; --j) {
+          coord[j] = nr[j] - delta[j];
+        }
+        POINTER_LIST[0] = i;
+        n = 1;
+        continue outer_loop;
+      } else if(t > u) {
         continue outer_loop;
       }
     }
-    //Update pointer
-    ++ptrs[i];
+    POINTER_LIST[n++] = i;
+  }
+
+  //Advance pointers
+  for(var i=0; i<n; ++i) {
+    ++ptrs[POINTER_LIST[i]];
   }
 }
 
