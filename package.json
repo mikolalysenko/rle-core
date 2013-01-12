@@ -9,9 +9,10 @@
   "dependencies": {
     "union-find": "~0.0.0"
   },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "devDependencies": {
+    "arcball": "~0.0.0",
+    "gl-shells": "~0.0.8",
+    "serverify": "~0.0.1"
   },
   "repository": {
     "type": "git",
