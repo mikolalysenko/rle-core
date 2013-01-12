@@ -39,7 +39,7 @@ var compareCoord = new Function("ra", "rb", [
 
 //Bisect an interval
 function bisect(runs, lo, hi, coord) {
-  while (lo < hi) {
+  while (lo <= hi) {
     var mid = (lo + hi) >> 1
       , s = compareCoord(runs[mid].coord, coord);
     if(s < 0) {
@@ -50,7 +50,7 @@ function bisect(runs, lo, hi, coord) {
       return mid;
     }
   }
-  return lo;
+  return hi;
 }
 
 exports.compareCoord      = compareCoord;

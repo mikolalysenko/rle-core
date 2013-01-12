@@ -131,7 +131,7 @@ StencilIterator.prototype.seek = function(coord) {
     for(var j=0; j<3; ++j) {
       tcoord[j] = coord[j] + delta[j];
     }
-    ptrs[i] = bisect(runs, 0, runs.length, tcoord);
+    ptrs[i] = Math.max(0, bisect(runs, 0, runs.length-1, tcoord)) ;
   }
 }
 

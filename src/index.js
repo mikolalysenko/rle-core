@@ -17,7 +17,7 @@ exports.Volume  = volume.Volume;
 exports.empty   = volume.empty;
 
 //Sampling
-exports.sample  = require("./sample.js").sample;
+exports.sample = require("./sample.js").sample;
 
 //Surface extraction
 exports.surface = require("./surface.js").surface;
@@ -27,6 +27,10 @@ exports.apply = require("./apply.js").apply;
 
 //Merging of multiple volumes
 exports.merge = require("./merge.js").merge;
+
+//Classifiers
+exports.testPoint = require("./test_point.js").testPoint;
+exports.testRay = require("./test_ray.js").testRay;
 
 //Morphology
 var morphology = require("./morphology.js");
