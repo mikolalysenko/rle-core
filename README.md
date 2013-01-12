@@ -1,28 +1,25 @@
-`rle-voxels`
+`rle-core`
 =========
 
-...is a Javascript library for working with narrowband level sets in 3D.  It is currently a work in progress, so expect this stuff to change over time.
+...is a Javascript library for working with narrowband level sets in 3D.  It is currently a work in progress, so expect this stuff to change over time.  This library contains fundamental primitives and data structures for manipulating these objects.
 
 Features for v0.1:
 
 * Run length encoding for high performance and low memory cost
 * Can perform dense sampling of implicit functions
-* Isosurface extraction
+* Surface computation via naive surface nets
 * Point membership queries
-* Boolean set operations (CSG)
-* Morphological operations (dilation, erosion, etc.)
+* Ray tests
+* Stencil based iteration
+* Merging
 * Connected component labelling
 
 Planned features:
 
 * Triangular mesh to level set conversion
 * Advection/upwind methods
-* Eikonal solvers
-* Transformation routines
-* Fast single component level set extraction (marching methods)
-* Ray casting tests
+* Transformations/warping
 * Integral operations (Minkowski functionals, etc.)
-* Collision tests
 
 Installation
 ============
@@ -43,12 +40,12 @@ And to use it:
 How it works
 ============
 
-Internally rle-voxels represents a volume as a list of runs sorted in colexicographic order.  This allows for efficient point membership queries and fast iteration.
+Internally rle-core represents a volume as a list of runs sorted in colexicographic order.  This allows for efficient point membership queries and fast iteration.
 
 Limitations
 -----------
 
-rle-voxels does not support efficient in place updates of volumes (though this may change in the future).  The reason for this is that there is no standard balanced binary search tree data structure for Javascript, and none of the implementations that I have seen so far are sufficiently mature, robust and performant for these sorts of data sets.
+rle-core does not support efficient in place updates of volumes (though this may change in the future).  The reason for this is that there is no standard balanced binary search tree data structure for Javascript, and none of the implementations that I have seen so far are sufficiently mature, robust and performant for these sorts of data sets.
 
 Documentation
 =============

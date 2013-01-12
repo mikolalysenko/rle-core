@@ -1,3 +1,7 @@
+var misc = require("./misc.js");
+
+var bisect = misc.bisect;
+
 //Checks if a point is contained in a volume
 function testPoint(volume, point) {
   var frac  = [0,0,0]

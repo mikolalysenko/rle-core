@@ -1,22 +1,37 @@
 {
-  "name": "rle-voxels",
-  "version": "0.0.2",
-  "description": "A library for working with narrow band level sets",
+  "name": "rle-core",
+  "version": "0.0.0",
+  "description": "Core tools for working with narrow band level sets in JavaScript",
   "main": "src/index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "dependencies": {
+    "union-find": "~0.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "repository": {
     "type": "git",
-    "url": "git://github.com/mikolalysenko/rle-voxels.git"
+    "url": "git://github.com/mikolalysenko/rle-core.git"
   },
   "keywords": [
     "voxels",
-    "rle",
-    "surface",
-    "webgl",
+    "levelset",
+    "potential",
     "solid",
-    "cad"
+    "cad",
+    "geometry",
+    "modeling",
+    "shapes",
+    "physics",
+    "3D",
+    "webgl"
   ],
   "author": "Mikola Lysenko",
   "license": "MIT",
   "readmeFilename": "README.md",
-  "gitHead": "f4b1cf2c8b27462c783e2bfa30a3b4ad63a637fa"
+  "gitHead": "e0cc6ff9fd4cb378ca13600040811dfa1448714e"
 }

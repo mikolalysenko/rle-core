@@ -26,5 +26,11 @@ exports.merge = require("./merge.js").merge;
 exports.testPoint = require("./test_point.js").testPoint;
 exports.testRay = require("./test_ray.js").testRay;
 
+//Connected components
+var components = require("./components.js");
+exports.labelComponents   = components.labelComponents;
+exports.splitComponents   = components.splitComponents;
+
 //Stencils
 exports.LpStencil = require("./stencils.js").LpStencil;
+
