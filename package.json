@@ -12,6 +12,7 @@
   "devDependencies": {
     "arcball": "~0.0.0",
     "gl-shells": "~0.0.8",
+    "jquery-browserify": "~1.8.1",
     "serverify": "~0.0.1"
   },
   "repository": {

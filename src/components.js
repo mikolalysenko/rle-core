@@ -1,9 +1,17 @@
+var UnionFind = require("union-find").UnionFind;
+var SURFACE_STENCIL = require("./surface.js").SURFACE_STENCIL;
+var createStencil = require("./stencil_iterator.js").createStencil;
+var misc = require("./misc.js");
+var CROSS_STENCIL = misc.CROSS_STENCIL;
+var volume = require("./volume.js");
+var Run = volume.Run
+  , Volume = volume.Volume;
 
 //Extracts all connected components of the volume
 function labelComponents(volume) {
   //First assign labels
-  var runs   = this.runs
-    , forest = new DisjointSet(runs.length);
+  var runs   = volume.runs
+    , forest = new UnionFind(runs.length);
   for(var iter=createStencil(volume, SURFACE_STENCIL); iter.hasNext(); iter.next()) {
     if(runs[iter.ptrs[0]].value < 0) {
       continue;
@@ -81,7 +89,7 @@ function splitComponents(volume, label_struct) {
   //Convert components back into volumes
   var volumes = new Array(count);
   for(var i=0; i<count; ++i) {
-    volumes[i] = new BinaryVolume(components[i]);
+    volumes[i] = new Volume(components[i]);
   }
   return volumes;
 }

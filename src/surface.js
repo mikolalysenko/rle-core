@@ -169,4 +169,5 @@ outer_loop:
   };
 }
 
-exports.surface = surface;
+exports.surface         = surface;
+exports.SURFACE_STENCIL = SURFACE_STENCIL;

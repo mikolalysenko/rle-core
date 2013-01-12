@@ -1,7 +1,7 @@
 `rle-core`
 =========
 
-...is a Javascript library for working with narrowband level sets in 3D.  It is currently a work in progress, so expect this stuff to change over time.  This library contains fundamental primitives and data structures for manipulating these objects.
+...is a JavaScript library for working with 3D narrowband level sets.  It is currently a work in progress, so expect this stuff to change over time.  This library contains fundamental primitives and data structures for manipulating these objects.
 
 Features for v0.1:
 
@@ -37,6 +37,30 @@ And to use it:
     var mesh = rle.surface(box);
 
 
+Running
+=======
+
+To run one of the demos, first install [`serverify`](https://github.com/mikolalysenko/Serverify) via npm:
+
+    sudo npm install -g serverify
+    
+Then go into one of the directories in `examples/` and run it.  For example:
+
+    cd examples/simple
+    serverify
+    
+And load the page in your browser at http://localhost:8080/index.html
+
+Documentation
+=============
+
+Here are some resources which explain how to use this library:
+
+* [API](https://github.com/mikolalysenko/rle-voxels/blob/master/API.md)
+* [Examples](https://github.com/mikolalysenko/rle-voxels/tree/master/examples)
+* [Live WebGL Demo](http://mikolalysenko.github.com/)
+* [Blog](http://0fps.wordpress.com)
+
 How it works
 ============
 
@@ -46,16 +70,6 @@ Limitations
 -----------
 
 rle-core does not support efficient in place updates of volumes (though this may change in the future).  The reason for this is that there is no standard balanced binary search tree data structure for Javascript, and none of the implementations that I have seen so far are sufficiently mature, robust and performant for these sorts of data sets.
-
-Documentation
-=============
-
-Here are some resources which explain how to use this library:
-
-* [API](https://github.com/mikolalysenko/rle-voxels/blob/master/API.md)
-* [Examples](https://github.com/mikolalysenko/rle-voxels/tree/master/examples)
-* [WebGL Demo](http://mikolalysenko.github.com/)
-* [Blog](http://0fps.wordpress.com)
 
 Acknowledgements
 ================
