@@ -15,9 +15,9 @@ function mooreStencil(radius_) {
 }
 
 //Creates an Lp ball stencil
-exports.LpStencil = function(p, radius_) {
+exports.lpStencil = function(p, radius_) {
   if(p === Number.POSITIVE_INFINITY) {
-    return mooreStencil(p, radius_);
+    return mooreStencil(radius_);
   }
   var result = []
     , radius = Math.ceil(radius_)

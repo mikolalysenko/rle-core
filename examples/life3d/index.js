@@ -1,8 +1,18 @@
 var $         = require("jquery-browserify")
   , rle       = require("../../src/index.js");
 
-var neighborhood  = rle.mooreStencil(1);
-var CENTER_INDEX  = 1 + 3 + 9;
+var INITIAL_RADIUS  = 16;
+var CENTER_INDEX    = 1 + 3 + 9;
+var neighborhood    = rle.lpStencil(Number.POSITIVE_INFINITY, 1);
+
+//Bounds for birth
+var SURVIVE_LO      = 4;
+var SURVIVE_HI      = 5;
+var BIRTH_LO        = 5;
+var BIRTH_HI        = 5;
+
+//Initial density
+var INITIAL_DENSITY = 0.2;
 
 //Advance game of life one tick
 function step(volume) {
@@ -10,16 +20,16 @@ function step(volume) {
     //Count neighbors
     var neighbors = 0;
     for(var i=0; i<27; ++i) {
-      if(values[i] >= 0) {
+      if(i !== CENTER_INDEX && values[i] >= 0) {
         ++neighbors;
       }
     }
     //Compute next state
-    if(values[1+3+9] >= 0) {
-      if(4 <= neighbors && neighbors <= 5) {
+    if(values[CENTER_INDEX] >= 0) {
+      if(SURVIVE_LO <= neighbors && neighbors <= SURVIVE_HI) {
         return 1;
       }
-    } else if(neighbors === 3) {
+    } else if(BIRTH_LO <= neighbors && neighbors <= BIRTH_HI) {
       return 1;
     }
     return -1;
@@ -32,28 +42,33 @@ $(document).ready(function() {
   var viewer = require("gl-shells").makeViewer();
   
   //Create random table
-  var table = new Array(256);
+  var table = new Array(8*INITIAL_RADIUS*INITIAL_RADIUS*INITIAL_RADIUS);
   for(var i=0; i<table.length; ++i) {
-    table[i] = Math.random() > 0.5 ? 1 : -1;
+    table[i] = Math.random() < INITIAL_DENSITY ? 1 : -1;
   }
   
-  //Create a volume
-  var state = rle.sample([-16,-16,-16], [16,16,16], function(x) {
+  //Initialize volume with random stuff
+  var state = rle.sample(
+    [-INITIAL_RADIUS,-INITIAL_RADIUS,-INITIAL_RADIUS],
+    [INITIAL_RADIUS, INITIAL_RADIUS, INITIAL_RADIUS], function(x) {
     for(var i=0; i<3; ++i) {
-      if(x[i] <= -16 || x[i] >= 15) {
+      if(x[i] <= -INITIAL_RADIUS || x[i] >= INITIAL_RADIUS-1) {
         return -1;
       }
     }
-    var n = x[0] + 57 * x[1] + 3517 * x[2];
-    n = (n << 13) ^ n;
-    return table[n&0xff];
+    var n = x[0] + INITIAL_RADIUS +
+        2 * INITIAL_RADIUS * ( x[1] + INITIAL_RADIUS +
+          2 * INITIAL_RADIUS * ( x[2] + INITIAL_RADIUS));
+    return table[n%table.length];
   });
   
+  //Set up interval to tick state
   setInterval(function() {
     state = step(state);
     viewer.updateMesh(rle.surface(state));
-  }, 2000);
+  }, 500);
   
+  //Draw initial mesh
   viewer.updateMesh(rle.surface(state));
   
 });

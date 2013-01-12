@@ -32,5 +32,5 @@ exports.labelComponents   = components.labelComponents;
 exports.splitComponents   = components.splitComponents;
 
 //Stencils
-exports.LpStencil = require("./stencils.js").LpStencil;
+exports.lpStencil = require("./stencils.js").lpStencil;
 

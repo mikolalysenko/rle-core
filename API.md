@@ -93,9 +93,9 @@ A ray hit record object containing the following parameters:
 * `t`: The t-value for the point the ray hit the volume.
 * `x`: A 3D array giving the point the ray hit the surface.
 
-## `LpStencil(p, radius)` ##
+## `lpStencil(p, radius)` ##
 
-Creates a stencil in the shape of an Lp-ball with the given radius.
+Creates a stencil in the shape of an L^p ball with the given radius.
 
 Params:
 * `p`: The power of the norm
@@ -105,4 +105,4 @@ Returns:
 An array of 3D integer indices in the shape of the specified neighborhood.
 
 Example:
-`LpStencil(1, radius)` gives a von Neumann stencil, while `LpStencil(Number.POSITIVE_INFINITY, radius)` gives the Moore neighborhood.  Taking `p = 2` gives a spherical stencil.
+`lpStencil(1, radius)` gives a von Neumann stencil, while `lpStencil(Number.POSITIVE_INFINITY, radius)` gives the Moore neighborhood.  Taking `p = 2` gives a spherical stencil.
