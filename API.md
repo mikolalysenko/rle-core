@@ -106,3 +106,26 @@ An array of 3D integer indices in the shape of the specified neighborhood.
 
 Example:
 `lpStencil(1, radius)` gives a von Neumann stencil, while `lpStencil(Number.POSITIVE_INFINITY, radius)` gives the Moore neighborhood.  Taking `p = 2` gives a spherical stencil.
+
+## `labelComponents(volume)` ##
+
+Labels the connected components of volume.
+
+Params:
+* `volume`: A `Volume`
+
+Returns:
+An object with the following properties:
+* `count`: A count of the number of connected components
+* `labels`:  An array with length = `volume.runs.length` labelling the connected component of each run.
+
+## `splitComponents(volume[, labelStruct])` ##
+
+Splits a volume into separate connected components.
+
+Params:
+* `volume`: A `Volume`
+* `labelStruct`: An optional structure which is the output of calling `labelComponents(volume)`
+
+Returns:
+An array of `Volume` objects, one for each separate connected component.
