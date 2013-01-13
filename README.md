@@ -31,9 +31,9 @@ Via npm:
 And to use it:
 
     var rle = require("rle-voxels");
-    var box = rle.sample([-40,-40,-40], [40,40,40], new Function("x",
-          "return 30 - Math.min(Math.min(Math.abs(x[0]), Math.abs(x[1])), Math.abs(x[2]));"
-        );
+    var box = rle.sample([-40,-40,-40], [40,40,40], function(x) {
+          return 30 - Math.min(Math.min(Math.abs(x[0]), Math.abs(x[1])), Math.abs(x[2]));
+        });
     var mesh = rle.surface(box);
 
 
