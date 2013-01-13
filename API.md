@@ -2,24 +2,29 @@
 
 ## `Volume(runs)` ##
 
-A sorted list of runs (encoded as `Run` objects) representing a narrowband level set.  Must have the property that every voxel near the surface is contained within a radius 1 von Neumann neighborhood.
+A sorted list of runs (encoded as `Run` objects) representing a multiphase narrowband level set.  Must have the property that every voxel near the surface is contained within a radius 1 von Neumann neighborhood.
 
-## `Run(coord, value)` ##
+## `Run(coord, distance, phase)` ##
 
-A record recording the `value` of the level set at the location `coord`.
+An object recording a point on a phase boundary.
+
+* `coord` is the voxel (integer rounded) xyz coordinate of the point
+* `distance` is the approximate distance to the phase boundary
+* `phase` is the phase of the voxel
 
 ## `empty()` ##
 
 Creates an empty volume 
 
-## `sample(lo, hi, potential)` ##
+## `sample(lo, hi, phase_func[, dist_func])` ##
 
 Samples the level set of `potential`  at uniform spacing over the range lo-hi
 
 Params:
 * `lo`: A 3D vector of integers giving the coordinates of the volume
 * `hi`: A 3D vector of upper bounds
-* `potential`: A function taking a 3D vector as input that returns an approximation of the signed distance field of some solid object.
+* `phase_func`: A function taking a coordinate represented as a length 3 array that returns an integer representing the phase of the material at this point.
+* `dist_func`: (optional) a function taking a coordinate represented as a length 3 array that returns the distance to the phase boundary.  If not present, distance is assumed to be constant (1).
 
 Returns:
 * A `Volume` representing the potential function in the region `[0,0,0]` to `resolution`.

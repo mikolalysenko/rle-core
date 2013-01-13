@@ -1,23 +1,29 @@
+"use strict"; "use restrict";
+
 var volume  = require("./volume.js")
   , misc    = require("./misc.js");
 
 var Run               = volume.Run
-  , Volume            = volume.Volume
-  , NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
-
+  , Volume            = volume.Volume;
 
 //Sample a volume
-function sample(lo, hi, density_func) {
+function sample(lo, hi, phase_func, dist_func) {
+  var volume  = volume.empty();
+
+  //If no distance function is present, just assume boundary distance is constant
+  if(!dist_func) {
+    dist_func = new Function("x", "return 1.0;");
+  }
   var x       = lo.slice(0)
     , y       = [ 0, 0, 0 ]
-    , runs    = [ new Run([NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY], -1) ];
+    , runs    = volume.runs;
+  
   //March over the volume
   for(x[2]=lo[2]; x[2]<hi[2]; ++x[2]) {
     for(x[1]=lo[1]; x[1]<hi[1]; ++x[1]) {
       for(x[0]=lo[0]; x[0]<hi[0]; ++x[0]) {
-        //Get field and sign value
-        var rho   = density_func(x)
-          , s_rho = rho < 0;
+        //Check if x is on a phase boundary
+        var phase = phase_func(x);
         y[0] = x[0];
         y[1] = x[1];
         y[2] = x[2];
@@ -25,9 +31,8 @@ outer_loop:
         for(var d=0; d<3; ++d) {
           for(var s=-1; s<=1; s+=2) {
             y[d] += s;
-            //Check if signs are consistent
-            if(s_rho !== (density_func(y) < 0)) {
-              runs.push(new Run(x.slice(0), rho));
+            if(phase !== phase_func(y)) {
+              runs.push(new Run(x.slice(0), dist_func(x), phase));
               break outer_loop;
             }
             y[d] = x[d];
@@ -36,8 +41,8 @@ outer_loop:
       }
     }
   }
-  //Returns a new binary volume
-  return new Volume(runs);
+  
+  return volume;
 }
 
 //Export sampling method
