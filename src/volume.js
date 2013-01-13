@@ -6,39 +6,45 @@ var misc = require("./misc.js");
 //Import globals
 var NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
 
-//Run data structure
-function Run(coord, distance, phase) {
-  this.coord    = coord;
-  this.distance = distance;
-  this.phase    = phase;
-}
-
-//Clones a run
-Run.prototype.clone = function() {
-  return new Run(this.coord.slice(0), this.distance, this.phase);
-}
-
 //A binary volume
-function Volume(runs) {
-  this.runs = runs;
+function Volume(coords, distances, phases) {
+  this.coords     = coords;
+  this.distances  = distances;
+  this.phases     = phases;
 };
 
 //Make a copy of a volume
 Volume.prototype.clone = function() {
-  var nruns = new Array(this.runs.length);
-  for(var i=0; i<this.runs.length; ++i) {
-    nruns[i] = this.runs[i].clone();
-  }
-  return new Volume(nruns);
+  return new Volume([
+      this.coords[0].slice(0),
+      this.coords[1].slice(0),
+      this.coords[2].slice(0)
+    ],
+    distances.slice(0),
+    phases.slice(0));
+}
+
+//Appends a run to the volume
+Volume.prototype.push = function(x, y, z, dist, phase) {
+  var coords = this.coords;
+  coords[0].push(x);
+  coords[1].push(y);
+  coords[2].push(z);
+  distances.push(dist);
+  phases.push(phase);
 }
 
 //Export data structures
-exports.Run     = Run;
 exports.Volume  = Volume;
 
 exports.empty     = function() {
   return new Volume([
-    new Run([NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY],1.0,0)
-  ]);
+      [NEGATIVE_INFINITY]
+    , [NEGATIVE_INFINITY]
+    , [NEGATIVE_INFINITY]
+    ]
+    , [1.0]
+    , [0]
+  );
 }
 
