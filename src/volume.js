@@ -4,18 +4,19 @@
 var misc = require("./misc.js");
 
 //Import globals
-var compareCoord      = misc.compareCoord
-  , bisect            = misc.bisect
-  , EPSILON           = misc.EPSILON
-  , POSITIVE_INFINITY = misc.POSITIVE_INFINITY
-  , NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
+var NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
 
 //Run data structure
-var Run = new Function("coord", "value", [
-  "this.coord=coord;",
-  "this.value=value;"
-].join("\n"));
+function Run(coord, distance, phase) {
+  this.coord    = coord;
+  this.distance = distance;
+  this.phase    = phase;
+}
 
+//Clones a run
+Run.prototype.clone = function() {
+  return new Run(this.coord.slice(0), this.distance, this.phase);
+}
 
 //A binary volume
 function Volume(runs) {
@@ -26,9 +27,7 @@ function Volume(runs) {
 Volume.prototype.clone = function() {
   var nruns = new Array(this.runs.length);
   for(var i=0; i<this.runs.length; ++i) {
-    var r = this.runs[i]
-      , c = r.coord;
-    nruns[i] = new Run([c[0], c[1], c[2]], r.value);
+    nruns[i] = this.runs[i].clone();
   }
   return new Volume(nruns);
 }
@@ -39,7 +38,7 @@ exports.Volume  = Volume;
 
 exports.empty     = function() {
   return new Volume([
-    new Run([NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY],-1.0)
+    new Run([NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY],1.0,0)
   ]);
 }
 
