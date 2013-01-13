@@ -1,3 +1,4 @@
+"use strict"; "use restrict";
 
 //Import stuff from misc.js
 var misc = require("./misc.js");
@@ -42,27 +43,36 @@ var EDGE_TABLE = new Array(256);
   }
 })();
 
+//Create default solid func
+var DEFAULT_SOLID_FUNC = new Function("phase", "return !!phase;");
 
 //Extracts a surface from the volume using elastic surface nets
-function surface(volume, lo, hi) {
-  var positions = []
-    , faces     = []
-    , runs      = volume.runs
-    , vals      = [0,0,0,0,0,0,0,0]
-    , v_ptr     = [0,0,0,0,0,0,0,0]
-    , nc        = [0,0,0]
-    , nd        = [0,0,0];
-  
+function surface(volume, lo, hi, solid_func) {
+
+  //Handle missing parameters
   if(!lo) {
     lo = [NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY];
   }
   if(!hi) {
     hi = [POSITIVE_INFINITY, POSITIVE_INFINITY, POSITIVE_INFINITY];
   }
-
+  if(!solid_func) {
+    solid_func = DEFAULT_SOLID_FUNC;
+  }
+  
+  //Locals
+  var positions = []
+    , faces     = []
+    , phases    = []
+    , runs      = volume.runs
+    , vals      = [0,0,0,0,0,0,0,0]
+    , v_ptr     = [0,0,0,0,0,0,0,0]
+    , nc        = [0,0,0]
+    , nd        = [0,0,0];
+  
+  //Get initial iterator
   var iter = createStencil(volume, SURFACE_STENCIL);
   iter.seek(lo);
-
 main_loop:
   for(; iter.hasNext(); iter.next()) {
   
@@ -77,14 +87,13 @@ main_loop:
     if(compareCoord(hi, coord) <= 0) {
       break;
     }
-  
     //Read in values and mask
     var ptrs = iter.ptrs
       , mask = 0;
     for(var i=0; i<8; ++i) {
-      var v = runs[ptrs[i]].value;
-      vals[i] = v;
-      mask |= v < 0 ? 0 : (1 << i);
+      var run = runs[ptrs[i]];
+      vals[i] = run.distance;
+      mask |= solid_func(run.phase) ? 0 : (1 << i);
     }
     if(mask === 0 || mask === 0xff) {
       continue;
@@ -107,7 +116,7 @@ main_loop:
           centroid[j] -= 1.0-EPSILON;
         }
       }
-      centroid[d] -= Math.min(1.0-EPSILON,Math.max(EPSILON, u / (u - v)));
+      centroid[d] -= Math.min(1.0-EPSILON,Math.max(EPSILON, u / (u + v)));
       ++count;
     }
     //Compute vertex
@@ -139,14 +148,12 @@ outer_loop:
         }
       }
     }
-    
     //Check if face in bounds
     for(var i=0; i<3; ++i) {
       if(coord[i] <= lo[i]) {
         continue main_loop;
       }
     }
-    
     //Add faces
     for(var i=0; i<3; ++i) {
       if(!(crossings & (1<<i))) {
@@ -155,17 +162,26 @@ outer_loop:
       var iu = 1<<((i+1)%3)
         , iv = 1<<((i+2)%3);
       if(mask & 128) {
+        var phase = runs[ptrs[7^(1<<i)]].phase;
+        phases.push(phase);
+        phases.push(phase);
+        
         faces.push([v_ptr[0],  v_ptr[iu], v_ptr[iv]]);
         faces.push([v_ptr[iv], v_ptr[iu], v_ptr[iu+iv]]);
       } else {
+        var phase = runs[ptrs[7]].phase;
+        phases.push(phase);
+        phases.push(phase);
+        
         faces.push([v_ptr[0],  v_ptr[iv], v_ptr[iu]]);
         faces.push([v_ptr[iu], v_ptr[iv], v_ptr[iu+iv]]);
       }
     }
   }
   return {
-    positions: positions,
-    faces:     faces
+    positions:  positions,
+    faces:      faces,
+    phases:     phases
   };
 }
 

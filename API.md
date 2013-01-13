@@ -10,7 +10,7 @@ An object recording a point on a phase boundary.
 
 * `coord` is the voxel (integer rounded) xyz coordinate of the point
 * `distance` is the approximate distance to the phase boundary
-* `phase` is the phase of the voxel
+* `phase` is the material phase of the voxel
 
 ## `empty()` ##
 
@@ -46,19 +46,21 @@ Example:
       return Math.abs(sphere_dist(x));
     });
 
-## `surface(volume, [lo,hi])` ##
+## `surface(volume[,lo,hi,solid_func])` ##
 
 Extracts a triangulated mesh representing the level set encoded in volume.
 
 Params:
 * `volume`:  The `Volume` object to query against
-* `lo`: Optional lower bound on region to extract surface from
-* `hi`: Optional upper bound on region to extract surface from
+* `lo`: (optional) lower bound on region to extract surface from.  Default unbounded
+* `hi`: (optional) upper bound on region to extract surface from.  Default unbounded
+* `solid_func`: (optional) A function that takes a phase as input and returns a flag determing whether to include the phase in the solid or not.  
 
 Returns:
 An object with two members representing an indexed triangulated mesh:
 * `positions`: A list of vertex positions represented as 3D coordinate vectors
 * `faces`: A list of triangles represnted by arrays of 3 integer indices into the `positions` array.
+* `phases`: An array with the same length as `faces` that storing the material phase of each face.
 
 ## `apply(volume, stencil, func)` ##
 

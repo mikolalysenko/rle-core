@@ -43,16 +43,20 @@ And to use it:
 Running
 =======
 
-To run one of the demos, first install [`serverify`](https://github.com/mikolalysenko/Serverify) via npm:
+To run one of the demos, first install [`serverify`](https://github.com/mikolalysenko/Serverify) (if you haven't already) via npm:
 
     sudo npm install -g serverify
+
+And then install the rest of the modules by running `npm install` from the root directory of the project:
+
+    npm install
     
-Then go into one of the directories in `examples/` and run it.  For example:
+Now you should be able to go into one of the directories in `examples/` and run it.  For example:
 
     cd examples/simple
     serverify
     
-And load the page in your browser at http://localhost:8080/index.html
+Once the server is running, you can view the demo in your browser at http://localhost:8080/index.html
 
 Documentation
 =============

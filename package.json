@@ -10,8 +10,7 @@
     "union-find": "~0.0.0"
   },
   "devDependencies": {
-    "arcball": "~0.0.0",
-    "gl-shells": "~0.0.8",
+    "gl-shells": "~0.0.2",
     "jquery-browserify": "~1.8.1",
     "serverify": "~0.0.1"
   },
