@@ -56,9 +56,9 @@ Documentation
 
 Here are some resources which explain how to use this library:
 
-* [API](https://github.com/mikolalysenko/rle-voxels/blob/master/API.md)
-* [Examples](https://github.com/mikolalysenko/rle-voxels/tree/master/examples)
-* [Live WebGL Demo](http://mikolalysenko.github.com/)
+* [API](https://github.com/mikolalysenko/rle-core/blob/master/API.md)
+* [Examples](https://github.com/mikolalysenko/rle-core/tree/master/examples)
+* [Live WebGL Demo](http://mikolalysenko.github.com/rle-core/index.html)
 * [Blog](http://0fps.wordpress.com)
 
 How it works
