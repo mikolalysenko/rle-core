@@ -32,7 +32,10 @@ And to use it:
 
     var rle = require("rle-voxels");
     var box = rle.sample([-40,-40,-40], [40,40,40], function(x) {
-          return 30 - Math.min(Math.min(Math.abs(x[0]), Math.abs(x[1])), Math.abs(x[2]));
+          if(Math.min(Math.min(Math.abs(x[0]), Math.abs(x[1])), Math.abs(x[2])) < 30) {
+            return 1;
+          }
+          return 0;
         });
     var mesh = rle.surface(box);
 

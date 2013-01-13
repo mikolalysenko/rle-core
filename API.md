@@ -31,9 +31,19 @@ Returns:
 
 Example:
 
-    //Create narrowband level set for a sphere
-    var sphere = rle.sample([-16,-16,-16], [16,16,16], function(x) {
+    //A signed distance function for a sphere with radius 10 centered at the origin
+    function sphere_dist(x) {
       return 10 - Math.sqrt(x[0]*x[0] + x[1]*x[1] + x[2]*x[2]);
+    };
+    
+    //Create a sphere
+    var sphere = rle.sample([-16,-16,-16], [16,16,16], function(x) {
+      if(sphere_dist(x) > 0) {
+        return 1;
+      }
+      return 0;
+    }, function(x) {
+      return Math.abs(sphere_dist(x));
     });
 
 ## `surface(volume, [lo,hi])` ##
