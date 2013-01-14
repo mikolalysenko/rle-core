@@ -5,7 +5,7 @@ var misc = require("./misc.js");
 var NEGATIVE_INFINITY     = misc.NEGATIVE_INFINITY
   , POSITIVE_INFINITY     = misc.POSITIVE_INFINITY
   , EPSILON               = misc.EPSILON
-  , SURFACE_STENCIL       = misc.SURFACE_STENCIL
+  , CUBE_STENCIL          = misc.CUBE_STENCIL
   , compareCoord          = misc.compareCoord;
 
 //Import stuff from stencil iterator
@@ -48,7 +48,6 @@ var DEFAULT_SOLID_FUNC = new Function("phase", "return !!phase;");
 
 //Extracts a surface from the volume using elastic surface nets
 function surface(volume, lo, hi, solid_func) {
-
   //Handle missing parameters
   if(!lo) {
     lo = [NEGATIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY];
@@ -59,23 +58,21 @@ function surface(volume, lo, hi, solid_func) {
   if(!solid_func) {
     solid_func = DEFAULT_SOLID_FUNC;
   }
-  
   //Locals
-  var positions = []
-    , faces     = []
-    , phases    = []
-    , runs      = volume.runs
-    , vals      = [0,0,0,0,0,0,0,0]
-    , v_ptr     = [0,0,0,0,0,0,0,0]
-    , nc        = [0,0,0]
-    , nd        = [0,0,0];
-  
+  var positions   = []
+    , faces       = []
+    , phases      = []
+    , vdistances  = volume.distances
+    , vphases     = volume.phases
+    , vals        = [0,0,0,0,0,0,0,0]
+    , v_ptr       = [0,0,0,0,0,0,0,0]
+    , nc          = [0,0,0]
+    , nd          = [0,0,0];
   //Get initial iterator
-  var iter = createStencil(volume, SURFACE_STENCIL);
+  var iter = createStencil(volume, CUBE_STENCIL);
   iter.seek(lo);
 main_loop:
   for(; iter.hasNext(); iter.next()) {
-  
     //Skip coordinates outside range
     var coord = iter.coord;
     for(var i=0; i<3; ++i) {
@@ -91,9 +88,8 @@ main_loop:
     var ptrs = iter.ptrs
       , mask = 0;
     for(var i=0; i<8; ++i) {
-      var run = runs[ptrs[i]];
-      vals[i] = run.distance;
-      mask |= solid_func(run.phase) ? 0 : (1 << i);
+      vals[i] = vdistances[ptrs[i]];
+      mask   |= solid_func(vphases[ptrs[i]]) ? 0 : (1 << i);
     }
     if(mask === 0 || mask === 0xff) {
       continue;
@@ -107,10 +103,10 @@ main_loop:
         continue;
       }
       var edge = CUBE_EDGES[i]
-        , eu = edge[0]
-        , u = vals[eu]
-        , v = vals[edge[1]]
-        , d = edge[2];
+        , eu  = edge[0]
+        , u   = vals[eu]
+        , v   = vals[edge[1]]
+        , d   = edge[2];
       for(var j=0; j<3; ++j) {
         if(eu & (1<<j)) {
           centroid[j] -= 1.0-EPSILON;
@@ -155,24 +151,22 @@ outer_loop:
       }
     }
     //Add faces
+    var phase0 = phases[ptrs[7]];
     for(var i=0; i<3; ++i) {
       if(!(crossings & (1<<i))) {
         continue;
       }
-      var iu = 1<<((i+1)%3)
+      var phase1 = phases[ptrs[7^(1<<i)]]
+        , iu = 1<<((i+1)%3)
         , iv = 1<<((i+2)%3);
       if(mask & 128) {
-        var phase = runs[ptrs[7^(1<<i)]].phase;
-        phases.push(phase);
-        phases.push(phase);
-        
+        phases.push([phase1, phase0]);
+        phases.push([phase1, phase0]);
         faces.push([v_ptr[0],  v_ptr[iu], v_ptr[iv]]);
         faces.push([v_ptr[iv], v_ptr[iu], v_ptr[iu+iv]]);
       } else {
-        var phase = runs[ptrs[7]].phase;
-        phases.push(phase);
-        phases.push(phase);
-        
+        phases.push([phase0, phase1]);
+        phases.push([phase0, phase1]);
         faces.push([v_ptr[0],  v_ptr[iv], v_ptr[iu]]);
         faces.push([v_ptr[iu], v_ptr[iv], v_ptr[iu+iv]]);
       }
@@ -186,4 +180,3 @@ outer_loop:
 }
 
 exports.surface         = surface;
-exports.SURFACE_STENCIL = SURFACE_STENCIL;

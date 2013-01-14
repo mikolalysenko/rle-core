@@ -47,62 +47,63 @@ StencilIterator.prototype.hasNext = function() {
 
 //Compute next coordinate
 StencilIterator.prototype.nextCoord = function() {
-  var ncoord = [0,0,0]
-    , runs    = this.volume.runs
+  var ncoord  = [POSITIVE_INFINITY, POSITIVE_INFINITY, POSITIVE_INFINITY]
+    , vcoords = this.volume.coords
+    , nruns   = this.volume.length
     , stencil = this.stencil
-    , ptrs    = this.ptrs
-    , tcoord  = [0,0,0];
-  for(var i=0; i<3; ++i) {
-    ncoord[i] = POSITIVE_INFINITY;
-  }
+    , ptrs    = this.ptrs;
   for(var i=0; i<stencil.length; ++i) {
-    if(ptrs[i] >= runs.length-1) {
+    var r_ptr = ptrs[i];
+    if(r_ptr >= nruns-1) {
       continue;
     }
-    var nr = runs[ptrs[i]+1].coord
-      , delta = stencil[i];
-    for(var j=0; j<3; ++j) {
-      tcoord[j] = nr[j] - delta[j];
-    }
-    if(compareCoord(tcoord, ncoord) < 0) {
-      for(var j=0; j<3; ++j) {
-        ncoord[j] = tcoord[j];
+    var delta = stencil[i];
+    for(var j=2; j>=0; --j) {
+      var t = coords[j][r_ptr] - delta[j]
+        , u = ncoord[j];
+      if(t < u) {
+        ncoord[j--] = t;
+        for(; j>=0; --j) {
+          ncoord[j] = coords[j][r_ptr] - delta[j];
+        }
+      } else if(t > u) {
+        break;
       }
     }
   }
   return ncoord;
 }
 
-
 //Advance iterator one position
 StencilIterator.prototype.next = function() {
-  var runs    = this.volume.runs
+  var coords  = this.volume.coords
+    , nruns   = coords[0].length
     , stencil = this.stencil
     , ptrs    = this.ptrs
     , coord   = this.coord
     , tcoord  = [0,0,0]
-    , n       = 0;
-  
+    , n       = 0
+    , nptrs   = this.stencil.length;
   //Push coordinate to infinity
   for(var i=0; i<3; ++i) {
     coord[i] = POSITIVE_INFINITY;
   }
-  
   //Loop through runs, find maximum pointer
 outer_loop:
-  for(var i=0; i<stencil.length; ++i) {
-    if(ptrs[i] >= runs.length-1) {
+  for(var i=0; i<nptrs; ++i) {
+    var r_ptr = ptrs[i];
+    if(r_ptr >= nruns-1) {
       continue;
     }
-    var nr = runs[ptrs[i]+1].coord
-      , delta = stencil[i];
+    var delta = stencil[i]
+      , n_ptr = r_ptr+1;
     for(var j=2; j>=0; --j) {
-      var t = nr[j] - delta[j]
+      var t = coords[j][n_ptr] - delta[j]
         , u = coord[j];
       if(t < u) {
         coord[j--] = t;
         for(; j>=0; --j) {
-          coord[j] = nr[j] - delta[j];
+          coord[j] = coords[j][n_ptr] - delta[j];
         }
         POINTER_LIST[0] = i;
         n = 1;
@@ -113,7 +114,6 @@ outer_loop:
     }
     POINTER_LIST[n++] = i;
   }
-
   //Advance pointers
   for(var i=0; i<n; ++i) {
     ++ptrs[POINTER_LIST[i]];
@@ -122,16 +122,19 @@ outer_loop:
 
 //Seek to target coordinate
 StencilIterator.prototype.seek = function(coord) {
-  var runs    = this.volume.runs
+  var nruns   = this.volume.length()
     , ptrs    = this.ptrs
     , stencil = this.stencil
     , tcoord  = [0,0,0];
+  for(var i=0; i<3; ++i) {
+    this.coord[i] = coord[i];
+  }
   for(var i=0; i<stencil.length; ++i) {
     var delta = stencil[i];
     for(var j=0; j<3; ++j) {
       tcoord[j] = coord[j] + delta[j];
     }
-    ptrs[i] = Math.max(0, bisect(runs, 0, runs.length-1, tcoord)) ;
+    ptrs[i] = this.volume.bisect(tcoord, 0, nruns-1) ;
   }
 }
 

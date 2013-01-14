@@ -1,8 +1,10 @@
+"use strict"; "use restrict";
+
 var EPSILON             = 1e-6
   , POSITIVE_INFINITY   =  (1<<30)
   , NEGATIVE_INFINITY   = -(1<<30)
   , CROSS_STENCIL       = [ [0,0,0] ]
-  , SURFACE_STENCIL     = [ ];
+  , CUBE_STENCIL        = [ ];
 
 //Compare two runs
 var compareCoord = new Function("ra", "rb", [
@@ -22,7 +24,7 @@ var compareCoord = new Function("ra", "rb", [
         p[j] = -1;
       }
     }
-    SURFACE_STENCIL.push(p);
+    CUBE_STENCIL.push(p);
   }
 })();
 
@@ -37,26 +39,9 @@ var compareCoord = new Function("ra", "rb", [
   }
 })();
 
-//Bisect an interval
-function bisect(runs, lo, hi, coord) {
-  while (lo <= hi) {
-    var mid = (lo + hi) >> 1
-      , s = compareCoord(runs[mid].coord, coord);
-    if(s < 0) {
-      lo = mid + 1;
-    } else if(s > 0) {
-      hi = mid - 1;
-    } else {
-      return mid;
-    }
-  }
-  return hi;
-}
-
 exports.compareCoord      = compareCoord;
-exports.bisect            = bisect;
 exports.EPSILON           = EPSILON;
 exports.POSITIVE_INFINITY = POSITIVE_INFINITY;
 exports.NEGATIVE_INFINITY = NEGATIVE_INFINITY;
 exports.CROSS_STENCIL     = CROSS_STENCIL;
-exports.SURFACE_STENCIL   = SURFACE_STENCIL;
+exports.CUBE_STENCIL      = CUBE_STENCIL;

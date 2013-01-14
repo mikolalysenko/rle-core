@@ -30,21 +30,48 @@ Volume.prototype.push = function(x, y, z, dist, phase) {
   coords[0].push(x);
   coords[1].push(y);
   coords[2].push(z);
-  distances.push(dist);
-  phases.push(phase);
+  this.distances.push(dist);
+  this.phases.push(phase);
+}
+
+//Returns the number of runs
+Volume.prototype.length = function() {
+  return this.distances.length;
+}
+
+//Bisect to find run containing coord within interval
+Volume.prototype.bisect = function(coord, lo, hi) {
+  var coords = this.coords;
+outer_loop:
+  while (lo <= hi) {
+    var mid = (lo + hi) >> 1;
+    for(var i=2; i>=0; --i) {
+      var s = coords[i][mid] - coord[i];
+      if(s < 0) {
+        lo = mid + 1;
+        continue outer_loop;
+      } else if(s > 0) {
+        hi = mid - 1;
+        continue outer_loop;
+      }
+    }
+    return mid;
+  }
+  return hi;
 }
 
 //Export data structures
 exports.Volume  = Volume;
 
+//Creates an empty volume
 exports.empty     = function() {
-  return new Volume([
-      [NEGATIVE_INFINITY]
-    , [NEGATIVE_INFINITY]
-    , [NEGATIVE_INFINITY]
+  return new Volume(
+    [
+        [NEGATIVE_INFINITY]
+      , [NEGATIVE_INFINITY]
+      , [NEGATIVE_INFINITY]
     ]
     , [1.0]
     , [0]
   );
 }
-
