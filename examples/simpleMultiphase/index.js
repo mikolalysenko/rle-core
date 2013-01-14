@@ -34,7 +34,7 @@ $(document).ready(function() {
   var colors = new Array(mesh.positions.length);
   for(var i=0; i<mesh.phases.length; ++i) {
     var f = mesh.faces[i]
-      , c = COLORS[mesh.phases[i]];
+      , c = COLORS[mesh.phases[i][0]];
     for(var j=0; j<f.length; ++j) {
       colors[f[j]] = c.slice(0);
     }

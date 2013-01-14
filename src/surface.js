@@ -151,12 +151,12 @@ outer_loop:
       }
     }
     //Add faces
-    var phase0 = phases[ptrs[7]];
+    var phase0 = vphases[ptrs[7]];
     for(var i=0; i<3; ++i) {
       if(!(crossings & (1<<i))) {
         continue;
       }
-      var phase1 = phases[ptrs[7^(1<<i)]]
+      var phase1 = vphases[ptrs[7^(1<<i)]]
         , iu = 1<<((i+1)%3)
         , iv = 1<<((i+2)%3);
       if(mask & 128) {
