@@ -4,49 +4,56 @@ var misc = require("./misc.js");
 var CROSS_STENCIL = misc.CROSS_STENCIL;
 var createStencil = require("./stencil_iterator.js").createStencil;
 
+//Remove old indices
+function deleteIndices(array, dead_runs) {
+  var ptr = dead_runs[0];
+  for(var i=0; i<dead_runs.length; ++i) {
+    //Copy interval from [l,h] backwards (ie do a memmove)
+    var l = dead_runs[i]+1
+      , h = i < dead_runs.length-1 ? dead_runs[i+1] : array.length;
+    for(var j=l; j<h; ++j) {
+      array[ptr++] = array[j];
+    }
+  }
+  //Resize buffer
+  array.length = array.length - dead_runs.length;
+}
+
 //Clean up redundant runs
 exports.cleanup = function(volume) {
-  var dead_runs = []
-    , runs      = volume.runs;
+  var dead_runs   = []
+    , vcoords     = volume.coords
+    , vdistances  = volume.distances
+    , vphases     = volume.phases;
   //Skip first run
-  var iter = createStencil(volume, CROSS_STENCIL);
+  var iter    = createStencil(volume, CROSS_STENCIL)
+    , icoord  = iter.coord
+    , ptrs    = iter.ptrs;
   iter.next();
 outer_loop:
   for(; iter.hasNext(); iter.next()) {
     //Skip runs which aren't at center
-    var r = runs[iter.ptrs[0]];
+    var cptr = iter.ptrs[0];
     for(var i=0; i<3; ++i) {
-      if(iter.coord[i] !== r.coord[i]) {
+      if(icoord[i] !== vcoords[i][cptr]) {
         continue outer_loop;
       }
     }
     //Check if all neighbors are equal
-    var phase = r.phase;
+    var phase = vphases[cptr];
     for(var i=1; i<7; ++i) {
-      if(phase !== runs[ iter.ptrs[i] ].phase ) {
+      if(phase !== vphases[ptrs[i]] ) {
         continue outer_loop;
       }
     }
-    dead_runs.push(iter.ptrs[0]);
+    dead_runs.push(cptr);
   }
   //Remove dead runs
   if(dead_runs.length > 0) {
-    var ptr = dead_runs[0];
-    for(var i=0; i<dead_runs.length; ++i) {
-      //Copy interval from [l,h] backwards (ie do a memmove)
-      var l = dead_runs[i]+1
-        , h = i < dead_runs.length-1 ? dead_runs[i+1] : runs.length;
-      for(var j=l; j<h; ++j) {
-        var s = runs[ptr++]
-          , t = runs[j];
-        for(var k=0; k<3; ++k) {
-          s.coord[k] = t.coord[k];
-        }
-        s.distance  = t.distance;
-        s.phase     = t.phase;
-      }
+    for(var i=0; i<3; ++i) {
+      deleteIndices(vcoords[i], dead_runs);
     }
-    //Resize buffer
-    runs.length = runs.length - dead_runs.length;
+    deleteIndices(vdistances, dead_runs);
+    deleteIndices(vphases, dead_runs);
   }
 }

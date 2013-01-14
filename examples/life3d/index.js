@@ -16,23 +16,27 @@ var INITIAL_DENSITY = 0.2;
 
 //Advance game of life one tick
 function step(volume) {
-  return rle.apply(volume, neighborhood, function(values) {
+  return rle.apply(volume, neighborhood, function(phases, distances, retval) {
+    retval.distance = 1.0;
     //Count neighbors
     var neighbors = 0;
     for(var i=0; i<27; ++i) {
-      if(i !== CENTER_INDEX && values[i] >= 0) {
+      if(i !== CENTER_INDEX && phases[i]) {
         ++neighbors;
       }
     }
     //Compute next state
-    if(values[CENTER_INDEX] >= 0) {
+    if(phases[CENTER_INDEX]) {
       if(SURVIVE_LO <= neighbors && neighbors <= SURVIVE_HI) {
-        return [1,1];
+        retval.phase = 1;
+        return;
       }
     } else if(BIRTH_LO <= neighbors && neighbors <= BIRTH_HI) {
-      return [1,1];
+      retval.phase = 1;
+      return;
     }
-    return [0,1];
+    retval.phase = 0;
+    return;
   });
 }
 

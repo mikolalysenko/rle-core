@@ -57,7 +57,7 @@ outer_loop:
     }
     return mid;
   }
-  return hi;
+  return Math.max(0,hi);
 }
 
 //Export data structures
