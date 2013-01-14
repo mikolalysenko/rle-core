@@ -1,16 +1,8 @@
 # API #
 
-## `Volume(runs)` ##
+## `Volume` ##
 
 A sorted list of runs (encoded as `Run` objects) representing a multiphase narrowband level set.  Must have the property that every voxel near the surface is contained within a radius 1 von Neumann neighborhood.
-
-## `Run(coord, distance, phase)` ##
-
-An object recording a point on a phase boundary.
-
-* `coord` is the voxel (integer rounded) xyz coordinate of the point
-* `distance` is the approximate distance to the phase boundary
-* `phase` is the material phase of the voxel
 
 ## `empty()` ##
 
@@ -60,7 +52,7 @@ Returns:
 An object with two members representing an indexed triangulated mesh:
 * `positions`: A list of vertex positions represented as 3D coordinate vectors
 * `faces`: A list of triangles represnted by arrays of 3 integer indices into the `positions` array.
-* `phases`: An array with the same length as `faces` that storing the material phase of each face.
+* `phases`: An array of pairs with the same length as `faces` that storing the material phase of each side of the face.
 
 ## `apply(volume, stencil, func)` ##
 
