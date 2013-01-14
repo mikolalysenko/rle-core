@@ -147,11 +147,15 @@ function intersectSurface(x, dir, vals) {
   return -1;
 }
 
-//Test a ray against the volume
-function testRay(volume, origin, direction, max_t) {
+var DEFAULT_SOLID_FUNC = new Function("p", "return !!p;");
 
+//Test a ray against the volume
+function testRay(volume, origin, direction, max_t, solid_func) {
   if(!max_t) {
     max_t = Number.POSITIVE_INFINITY;
+  }
+  if(!solid_func) {
+    solid_func = DEFAULT_SOLID_FUNC;
   }
   //Unpack local variables
   var runs  = volume.runs
@@ -161,7 +165,6 @@ function testRay(volume, origin, direction, max_t) {
     , y     = [0,0,0]
     , t     = 0.0
     , vals  = [0,0,0,0,0,0,0,0];
-  
 outer_loop:
   while(t <= max_t) {
     //Get integer/faction parts of coordinate

@@ -2,9 +2,7 @@
 
 var misc = require("./misc.js");
 
-var compareCoord      = misc.compareCoord
-  , bisect            = misc.bisect
-  , POSITIVE_INFINITY = misc.POSITIVE_INFINITY
+var POSITIVE_INFINITY = misc.POSITIVE_INFINITY
   , NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
 
 var POINTER_LIST = new Array(128);
@@ -46,12 +44,17 @@ StencilIterator.prototype.hasNext = function() {
 }
 
 //Compute next coordinate
-StencilIterator.prototype.nextCoord = function() {
-  var ncoord  = [POSITIVE_INFINITY, POSITIVE_INFINITY, POSITIVE_INFINITY]
-    , vcoords = this.volume.coords
+StencilIterator.prototype.nextCoord = function(ncoord) {
+  if(!ncoord) {
+    ncoord = new Array(3);
+  }
+  var vcoords = this.volume.coords
     , nruns   = this.volume.length
     , stencil = this.stencil
     , ptrs    = this.ptrs;
+  for(var i=0; i<3; ++i) {
+    ncoord[i] = POSITIVE_INFINITY;
+  }
   for(var i=0; i<stencil.length; ++i) {
     var r_ptr = ptrs[i];
     if(r_ptr >= nruns-1) {
@@ -136,6 +139,34 @@ StencilIterator.prototype.seek = function(coord) {
     }
     ptrs[i] = this.volume.bisect(tcoord, 0, nruns-1) ;
   }
+}
+
+//Retrieve phases at current iterator position
+StencilIterator.prototype.phases = function(result) {
+  var vphases = this.volume.phases
+    , ptrs    = this.ptrs
+    , n       = ptrs.length;
+  if(!result) {
+    result = new Array(n);
+  }
+  for(var i=0; i<n; ++i) {
+    result[i] = vphases[ptrs[i]];
+  }
+  return result;
+}
+
+//Retrieve distances at current iterator position
+StencilIterator.prototype.distances = function(result) {
+  var vdistances  = this.volume.distances
+    , ptrs        = this.ptrs
+    , n           = ptrs.length;
+  if(!result) {
+    result = new Array(n);
+  }
+  for(var i=0; i<n; ++i) {
+    result[i] = vdistances[ptrs[i]];
+  }
+  return result;
 }
 
 //Creates a stencil iterator
