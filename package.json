@@ -4,16 +4,16 @@
   "description": "Core tools for working with narrow band level sets in JavaScript",
   "main": "src/index.js",
   "directories": {
-    "example": "examples"
+    "test": "test",
+    "lib":  "lib"
+  },
+  "scripts" : {
+    "test": "tap ./test"
   },
   "dependencies": {
-    "union-find": "~0.0.0"
   },
   "devDependencies": {
-    "gl-shells": "~0.0.2",
-    "jquery-browserify": "~1.8.1",
-    "serverify": "~0.0.1",
-    "rle-stencils": "~0.0.0"
+    "tap": "~0.3.3"
   },
   "repository": {
     "type": "git",

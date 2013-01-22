@@ -1,82 +1,127 @@
 `rle-core`
 =========
 
-...is a JavaScript library for working with 3D narrowband level sets.  It is currently a work in progress, so expect this stuff to change over time.  This library contains fundamental primitives and data structures for manipulating these objects.
+...is the central package in the `rle-*` CommonJS libraries for 3D narrow band level sets.  These tools are currently a work in progress, so expect stuff to change over time.  This package contains fundamental data structures for working with narrowband level sets. Higher order algorithms are to be built on top of these tools.
 
-Features for v0.1:
+A narrowband level set is a sparse representation of a level set as it is sampled on a regular grid.  However, instead of storing an entire dense array of voxels, narrowband methods only store voxels which are near the boundary of the level set.  This means that their storage and processing requirements are typically O(n^2/3) of the size of a dense level set.  To facilitate efficient queries and streaming operations, these points are stored in lexicographic order.  Doing so allows queries like point membership or surface extraction to run with at most a logarithmic overhead.  As a result, narrowband methods are often much more efficient than dense methods.
 
-* Run length encoding for high performance and low memory cost
-* Can perform dense sampling of implicit functions
-* Surface computation via naive surface nets
-* Point membership queries
-* Ray tests
-* Stencil based iteration
-* Merging
-* Connected component labelling
+`rle` does not support efficient in place updates of volumes (though this may eventually change in the future).  The reason for this is that there is no standard balanced binary search tree data structure for Javascript, and none of the implementations that I have seen so far are sufficiently mature, robust and performant for these sorts of data sets.  This situation will probably improve once ECMAScript 6 is more widely supported.
 
-Planned features:
+Overview
+--------
 
-* Triangular mesh to level set conversion
-* Advection/upwind methods
-* Transformations/warping
-* Integral operations (Minkowski functionals, etc.)
+Currently, the `rle-*` family of narrowband codes consists of the following packages:
 
-Installation
-============
+* `rle-core`: (This one) Foundational data structures and algorithms
+* `rle-mesh`: Surface extraction and meshing operations
+* `rle-funcs`: Functional programming primitives for narrowband levelsets
+* `rle-topology`: Topological computations on level sets (connected component extraction, etc.)
+* `rle-stencils`: Commonly used stencils
+* `rle-repair`: Repair and validation methods, mostly used internally
+* `rle-classify`: Primitive classification and queries.  Supports points, lines, rays, boxes, etc.
+* `rle-csg`: Constructive solid geometry (aka boolean set operations)
+* `rle-morphology`: Mathematical morphology for level sets.
 
-Via npm:
+If you want your own package added to the list, open an issue and I'll stick it here.
 
-    npm install rle-voxels
+Usage
+=====
 
-And to use it:
+First, install it via npm:
 
-    var rle = require("rle-voxels");
-    var box = rle.sample([-40,-40,-40], [40,40,40], function(x) {
-          if(Math.min(Math.min(Math.abs(x[0]), Math.abs(x[1])), Math.abs(x[2])) < 30) {
-            return 1;
-          }
-          return 0;
-        });
-    var mesh = rle.surface(box);
+    npm install rle-core
 
+Then, you can use the core library as follows:
 
-Running
-=======
-
-To run one of the demos, first install [`serverify`](https://github.com/mikolalysenko/Serverify) (if you haven't already) via npm:
-
-    sudo npm install -g serverify
-
-And then install the rest of the modules by running `npm install` from the root directory of the project:
-
-    npm install
+    var core = require("rle-core");
     
-Now you should be able to go into one of the directories in `examples/` and run it.  For example:
+    //Create a box
+    var box = core.sample([-10,-10,-10], [10,10,10], function(x) {
+      return Math.max(x[0], x[1], x[2]) < 10 ? 0 : 1
+    });
 
-    cd examples/simple
-    serverify
-    
-Once the server is running, you can view the demo in your browser at http://localhost:8080/index.html
+The `rle-core` module exposes the following objects and methods:
 
-Documentation
-=============
 
-Here are some resources which explain how to use this library:
+`rle-core`
+----------
 
-* [API](https://github.com/mikolalysenko/rle-core/blob/master/API.md)
-* [Example Code](https://github.com/mikolalysenko/rle-core/tree/master/examples)
-* [WebGL Demos](http://mikolalysenko.github.com/rle-core/index.html)
-* [Blog](http://0fps.wordpress.com)
+### `core.empty()`
 
-How it works
-============
+### `core.sample(lo, hi, phase_func[, distance_func])`
 
-Internally rle-core represents a volume as a list of runs sorted in colexicographic order.  This allows for efficient point membership queries and fast iteration.
+### `core.beginStencil(volume, stencil)`
 
-Limitations
------------
+### `core.beginMulti(volumes, stencil)`
 
-rle-core does not support efficient in place updates of volumes (though this may change in the future).  The reason for this is that there is no standard balanced binary search tree data structure for Javascript, and none of the implementations that I have seen so far are sufficiently mature, robust and performant for these sorts of data sets.
+
+`Volume`
+--------
+The `Volume` class is the basic datatype for multiphase level sets.  It has the following members:
+
+### `Volume.coords : Array(Array(int))`
+
+### `Volume.distances : Array(float)`
+
+### `Volume.phases : Array(int)`
+
+### `Volume.clone()`
+
+### `Volume.length()`
+
+### `Volume.push(x,y,z,distance,phase)`
+
+### `Volume.point(i,x)`
+
+### `Volume.bisect(coord, lo, hi)`
+
+`StencilIterator`
+-----------------
+
+### `StencilIterator.volume : Volume`
+
+### `StencilIterator.stencil : Array(Array(int))`
+
+### `StencilIterator.ptrs : Array(int))`
+
+### `StencilIterator.clone()`
+
+### `StencilIterator.hasNext()`
+
+### `StencilIterator.next()`
+
+### `StencilIterator.seek(coord)`
+
+### `StencilIterator.nextCoord([result])`
+
+### `StencilIterator.phases([result])`
+
+### `StencilIterator.distances([result])`
+
+`MultiIterator`
+-----------------
+
+### `MultiIterator.volume : Volume`
+
+### `MultiIterator.stencil : Array(Array(int))`
+
+### `MultiIterator.ptrs : Array(int))`
+
+### `MultiIterator.clone()`
+
+### `MultiIterator.hasNext()`
+
+### `MultiIterator.next()`
+
+### `MultiIterator.seek(coord)`
+
+### `MultiIterator.subiterator(n)`
+
+### `MultiIterator.nextCoord([result])`
+
+### `MultiIterator.phases([result])`
+
+### `MultiIterator.distances([result])`
 
 Acknowledgements
 ================
