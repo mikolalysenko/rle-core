@@ -40,7 +40,17 @@ Then, you can use the core library as follows:
       return Math.max(x[0], x[1], x[2]) < 10 ? 0 : 1
     });
 
-The `rle-core` module exposes the following objects and methods:
+
+
+Just the basics
+===============
+
+For beginners, there are really only two methods you will ever need to use in this package:
+
+* `empty`
+* `sample`
+
+With these tools and the other packages, you should be able to get around and do basic volume
 
 
 `rle-core`
@@ -48,12 +58,35 @@ The `rle-core` module exposes the following objects and methods:
 
 ### `core.empty()`
 
+**Returns:** An empty narrowband level set
+
 ### `core.sample(lo, hi, phase_func[, distance_func])`
+
+* `lo`: Lower bound on the volume, represented as 3d array of ints
+* `hi`: Upper bound on the volume, 3d array of ints
+* `phase_func(x)`: A function taking a 3d array of floats as input, returning an int representing the phase of the level set at point x.
+* `distance_func(x)`: (Optional) A function that returns the distance to the phase boundary
+
+**Returns:** A narrowband level set representation of `phase_func`
 
 ### `core.beginStencil(volume, stencil)`
 
+
+
+
 ### `core.beginMulti(volumes, stencil)`
 
+### `core.NEGATIVE_INFINITY : int`
+
+A special value representing the start of a coordinate.  This is not the same as `Number.NEGATIVE_INFINITY`
+
+### `core.POSITIVE_INFINITY : int`
+
+A special value representing the end coordinate of the volume.  Not the same as `Number.POSITIVE_INFINITY`
+
+### `core.EPSILON : float`
+
+A small floating point number.
 
 `Volume`
 --------
