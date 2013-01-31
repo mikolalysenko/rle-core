@@ -9,17 +9,18 @@ exports.compareCoord      = misc.compareCoord;
 
 //Basic data types
 var volume = require("./lib/volume.js");
-exports.Volume  = volume.Volume;
-exports.empty   = volume.empty;
+exports.Volume            = volume.Volume;
+exports.VolumeBuilder     = volume.VolumeBuilder;
+exports.empty             = volume.empty;
 
 //Implicit function -> Level set conversion
 exports.sample = require("./lib/sample.js").sample;
 
 //Iterators
 var stencil = require("./lib/stencil_iterator.js");
-exports.StencilIterator = stencil.StencilIterator;
-exports.beginStencil    = stencil.beginStencil;
+exports.StencilIterator   = stencil.StencilIterator;
+exports.beginStencil      = stencil.beginStencil;
 
 var multi = require("./lib/multi_iterator.js");
-exports.MultiIterator   = multi.MultiIterator;
-exports.beginMulti      = multi.beginMulti;
+exports.MultiIterator     = multi.MultiIterator;
+exports.beginMulti        = multi.beginMulti;
