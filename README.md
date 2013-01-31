@@ -72,24 +72,29 @@ A small floating point number.
 --------
 The `Volume` class is the basic datatype for multiphase level sets.  It has the following members:
 
-### `Volume.coords : Array(Array(int))`
+### `coords : Array(Array(int))`
 
-### `Volume.distances : Array(float)`
+### `distances : Array(float)`
 
-### `Volume.phases : Array(int)`
+### `phases : Array(int)`
 
-### `Volume.clone()`
+### `clone()`
 
 ### `Volume.length()`
 
-### `Volume.push(x,y,z,distance,phase)`
-
-### `Volume.point(i,x)`
+### `Volume.point(i,retval)`
 
 ### `Volume.bisect(coord, lo, hi)`
 
-`StencilIterator`
------------------
+
+`VolumeBuilder`
+---------------
+
+### `push`
+
+
+`StencilIterator`/`MultiIterator`
+---------------------------------
 
 ### `StencilIterator.volume : Volume`
 
