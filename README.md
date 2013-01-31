@@ -3,29 +3,8 @@
 
 ...is the central package in the `rle-*` CommonJS libraries for 3D narrow band level sets.  These tools are currently a work in progress, so expect stuff to change over time.  This package contains fundamental data structures for working with narrowband level sets. Higher order algorithms are to be built on top of these tools.
 
-A narrowband level set is a sparse representation of a level set as it is sampled on a regular grid.  However, instead of storing an entire dense array of voxels, narrowband methods only store voxels which are near the boundary of the level set.  This means that their storage and processing requirements are typically O(n^2/3) of the size of a dense level set.  To facilitate efficient queries and streaming operations, these points are stored in lexicographic order.  Doing so allows queries like point membership or surface extraction to run with at most a logarithmic overhead.  As a result, narrowband methods are often much more efficient than dense methods.
-
-`rle` does not support efficient in place updates of volumes (though this may eventually change in the future).  The reason for this is that there is no standard balanced binary search tree data structure for Javascript, and none of the implementations that I have seen so far are sufficiently mature, robust and performant for these sorts of data sets.  This situation will probably improve once ECMAScript 6 is more widely supported.
-
-Overview
---------
-
-Currently, the `rle-*` family of narrowband codes consists of the following packages:
-
-* `rle-core`: (This one) Foundational data structures and algorithms
-* `rle-mesh`: Surface extraction and meshing operations
-* `rle-funcs`: Functional programming primitives for narrowband levelsets
-* `rle-topology`: Topological computations on level sets (connected component extraction, etc.)
-* `rle-stencils`: Commonly used stencils
-* `rle-repair`: Repair and validation methods, mostly used internally
-* `rle-classify`: Primitive classification and queries.  Supports points, lines, rays, boxes, etc.
-* `rle-csg`: Constructive solid geometry (aka boolean set operations)
-* `rle-morphology`: Mathematical morphology for level sets.
-
-If you want your own package added to the list, open an issue and I'll stick it here.
-
-Usage
-=====
+Installation
+============
 
 First, install it via npm:
 
@@ -40,6 +19,10 @@ Then, you can use the core library as follows:
       return Math.max(x[0], x[1], x[2]) < 10 ? 0 : 1
     });
 
+Or if you want some more features, you can just pull in rle-all:
+
+    npm install rle
+
 
 
 Just the basics
@@ -52,8 +35,7 @@ For beginners, there are really only two methods you will ever need to use in th
 
 With these tools and the other packages, you should be able to get around and do basic volume
 
-
-`rle-core`
+API
 ----------
 
 ### `core.empty()`
@@ -70,8 +52,6 @@ With these tools and the other packages, you should be able to get around and do
 **Returns:** A narrowband level set representation of `phase_func`
 
 ### `core.beginStencil(volume, stencil)`
-
-
 
 
 ### `core.beginMulti(volumes, stencil)`
