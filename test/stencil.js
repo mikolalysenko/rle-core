@@ -14,11 +14,12 @@ test("stencil_iterator", function(t) {
   var sphere_vol = rle.sample([-10,-10,-10],[10,10,10], sphere_phase, sphere_func);
   
   //Try creating iterator
-  var iter = rle.beginStencil(sphere_vol, [[0,0,0]]);
+  var iter = rle.beginStencil(sphere_vol, new Int32Array(3));
   
   //Try basic iteration
   t.ok(iter.hasNext());
   var n = 0;
+  
   
   phases = new Array(1);
   while(iter.hasNext()) {
@@ -30,15 +31,7 @@ test("stencil_iterator", function(t) {
     iter.phases(phases);
     t.equal(phases[0], sphere_phase(coord), "checking phase");
     
-    
-    //Check next coord is consistent
-    var p = iter.clone();
     iter.next();
-    var nc = new Array(3);
-    p.nextCoord(nc);
-    t.equals(nc[0], iter.coord[0], "nextCoord[0]");
-    t.equals(nc[1], iter.coord[1], "nextCoord[1]");
-    t.equals(nc[2], iter.coord[2], "nextCoord[2]");
   }
   
   //Final sanity check
@@ -47,7 +40,7 @@ test("stencil_iterator", function(t) {
   
   
   //Now try iteration with stencil
-  var stencil = [[1,0,0], [0,1,0], [0,0,1]];
+  var stencil = new Int32Array([1,0,0,   0,1,0,  0,0,1]);
   iter = rle.beginStencil(sphere_vol, stencil);
   
   var phases = new Array(stencil.length);
@@ -57,22 +50,15 @@ test("stencil_iterator", function(t) {
     //Check phases
     var coord   = iter.coord
     iter.phases(phases);
-    for(var i=0; i<stencil.length; ++i) {
-      var tmp = coord.slice(0);
+    for(var i=0; i<3; ++i) {
+      var tmp = new Int32Array(coord);
       for(var j=0; j<3; ++j) {
-        tmp[j] += stencil[i][j];
+        tmp[j] += stencil[3*i+j];
       }
       t.equals(phases[i], sphere_phase(tmp));
     }
-  
-    //Check next coord is consistent
-    var p = iter.clone();
     iter.next();
-    var nc = new Array(3);
-    p.nextCoord(nc);
-    t.equals(nc[0], iter.coord[0], "nextCoord[0]");
-    t.equals(nc[1], iter.coord[1], "nextCoord[1]");
-    t.equals(nc[2], iter.coord[2], "nextCoord[2]");
+  
   }
   
   t.end();

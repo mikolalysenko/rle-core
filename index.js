@@ -14,7 +14,7 @@ exports.VolumeBuilder     = volume.VolumeBuilder;
 exports.empty             = volume.empty;
 
 //Implicit function -> Level set conversion
-exports.sample = require("./lib/sample.js").sample;
+exports.sample            = require("./lib/sample.js");
 
 //Iterators
 var stencil = require("./lib/stencil_iterator.js");
