@@ -14,12 +14,11 @@ test("multi_iterator", function(t) {
   var sphere_vol = rle.sample([-10,-10,-10],[10,10,10], sphere_phase, sphere_func);
   
   //Try creating iterator
-  var iter = rle.beginMulti([sphere_vol, new DynamicVolume()], new Int32Array(3));
+  var iter = rle.beginMulti([sphere_vol, new rle.DynamicVolume()], new Int32Array(3));
   
   //Try basic iteration
   t.ok(iter.hasNext());
   var n = 0;
-  
   
   phases = new Array(1);
   while(iter.hasNext()) {
@@ -28,8 +27,8 @@ test("multi_iterator", function(t) {
     
     //Check phases are consistent
     var coord  = iter.coord;
-    iter.phases(phases);
-    t.equal(phases[0], sphere_phase(coord), "checking phase");
+    t.equal(sphere_vol.phases[iter.ptrs[0]], sphere_phase(coord), "checking phase");
+    t.equal(iter.ptrs[1], 0)
     
     iter.next();
   }
@@ -37,8 +36,9 @@ test("multi_iterator", function(t) {
   //Final sanity check
   t.equal(iter.ptrs[0], sphere_vol.length()-1);
   t.equal(iter.coord[0], rle.POSITIVE_INFINITY);
+  t.equal(iter.ptrs[1], 0);
   
-  
+  /*
   //Now try iteration with stencil
   var stencil = new Int32Array([1,0,0,   0,1,0,  0,0,1]);
   iter = rle.beginStencil(sphere_vol, stencil);
@@ -60,6 +60,7 @@ test("multi_iterator", function(t) {
     iter.next();
   
   }
+  */
   
   t.end();
 });

@@ -28,8 +28,7 @@ test("stencil_iterator", function(t) {
     
     //Check phases are consistent
     var coord  = iter.coord;
-    iter.phases(phases);
-    t.equal(phases[0], sphere_phase(coord), "checking phase");
+    t.equal(sphere_vol.phases[iter.ptrs[0]], sphere_phase(coord), "checking phase");
     
     iter.next();
   }
@@ -43,19 +42,16 @@ test("stencil_iterator", function(t) {
   var stencil = new Int32Array([1,0,0,   0,1,0,  0,0,1]);
   iter = rle.beginStencil(sphere_vol, stencil);
   
-  var phases = new Array(stencil.length);
-  
   while(iter.hasNext()) {
   
     //Check phases
     var coord   = iter.coord
-    iter.phases(phases);
     for(var i=0; i<3; ++i) {
       var tmp = new Int32Array(coord);
       for(var j=0; j<3; ++j) {
         tmp[j] += stencil[3*i+j];
       }
-      t.equals(phases[i], sphere_phase(tmp));
+      t.equals(sphere_vol.phases[iter.ptrs[i]], sphere_phase(tmp));
     }
     iter.next();
   

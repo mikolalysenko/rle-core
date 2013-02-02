@@ -40,7 +40,7 @@ With this method and the tools in the other  packages, you should be able to get
 
 The rest of the stuff
 =====================
-This package contains iterators and data structures.  There are basically two kinds of RLE volumes, StaticVolumes and DynamicVolumes.  Whichever one you pick should depend on the application you have in mind.  If your volume is short lived, and you are going to be modifying it a lot, use a dynamic volume.  Otherwise, a StaticVolume may be a better bet. 
+This package contains iterators and data structures.  There are basically two kinds of RLE volumes, StaticVolumes and DynamicVolumes.  Whichever one you pick should depend on the application you have in mind.  If your volume is short lived, and you are going to be modifying it a lot, use a DynamicVolume.  Accessing StaticVolumes is around 10% more efficient, and they use less memory since they are built on top of typed arrays.  However, constructing a StaticVolume is pretty expensive and so don't build one if you are only going to keep it around for a short time.
 
 ## `StaticVolume` and `DynamicVolume`
 
@@ -73,7 +73,7 @@ Returns a static version of the volume
 ### `volume.toDynamic()` (StaticVolume only)
 Returns a dynamic version of the volume
 
-## Iterators
+## `StencilIterator` and `MultiIterator`
 
 There are also two different types of iterators.  `StencilIterator`s and `MultiIterator`s.  The main difference is that `StencilIterator` is optimized to iterate over a single volume, while `MultiIterator` iterates over several volumes simultaneously.  To create a stencil iterator, you call:
 
@@ -104,12 +104,6 @@ Advances the iterator forward one run
 
 ### `iter.seek(coord)`
 Sets the iterator coordinate to `coord`
-
-### `iter.phases(result)`
-Reads in the phases of the volume into `result`, which is an array of length equal to the number of points in the stencil times the number of volumes being iterated over.
-
-### `iter.distances(result)`
-Reads in the distances of the volume.  Same deal as above.
 
 ### `iter.subiterator(n)` (MultiIterator only)
 Returns the stencil iterator associated to volume `n` at the location of the current multiiterator.
