@@ -33,7 +33,7 @@
     "webgl"
   ],
   "author": "Mikola Lysenko",
-  "license": "MIT",
+  "license": "BSD",
   "readmeFilename": "README.md",
   "gitHead": "e0cc6ff9fd4cb378ca13600040811dfa1448714e"
 }

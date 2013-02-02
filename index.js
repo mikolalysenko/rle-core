@@ -9,9 +9,8 @@ exports.compareCoord      = misc.compareCoord;
 
 //Basic data types
 var volume = require("./lib/volume.js");
-exports.Volume            = volume.Volume;
-exports.VolumeBuilder     = volume.VolumeBuilder;
-exports.empty             = volume.empty;
+exports.DynamicVolume     = volume.DynamicVolume;
+exports.StaticVolume      = volume.StaticVolume;
 
 //Implicit function -> Level set conversion
 exports.sample            = require("./lib/sample.js");
