@@ -15,8 +15,8 @@ Then, you can use the core library as follows:
     var core = require("rle-core");
     
     //Create a box
-    var box = core.sample([-10,-10,-10], [10,10,10], function(x) {
-      return Math.max(x[0], x[1], x[2]) < 10 ? 0 : 1
+    var box = core.sampleSolid([-10,-10,-10], [10,10,10], function(x) {
+      return Math.max(Math.abs(x[0]), Math.abs(x[1]), Math.abs(x[2]));
     });
 
 Or if you want some more features, you can just pull in rle-all:
@@ -25,7 +25,19 @@ Or if you want some more features, you can just pull in rle-all:
 
 Just the basics
 ===============
-For beginners, there is really only one method you will ever need in this package:
+For beginners, there is most important method you need to understand in this package is the following:
+
+
+### `sampleSolid(lo, hi, dist_func)`
+This function creates a narrowband level set representation of the given solid object.
+
+* `lo` is a lower bound on the volume to sample
+* `hi` is an upper bound
+* `dist_func(x)` is a signed distance function that gives the distance to the boundary of the solid.
+
+A little more complicated
+-------------------------
+`rle` can also handle objects with multiple phases.  To create one of these things, you can use the more advanced sampler:
 
 ### `sample(lo, hi, phase_func[, distance_func])`
 
