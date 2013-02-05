@@ -117,6 +117,9 @@ Advances the iterator forward one run
 ### `iter.seek(coord)`
 Sets the iterator coordinate to `coord`
 
+### `iter.getValues(phases, distances)`
+Retrieves the phases/distance-to-phase-boundary for each point in the iterator.  
+
 ### `iter.subiterator(n)` (MultiIterator only)
 Returns the stencil iterator associated to volume `n` at the location of the current multiiterator.
 
@@ -127,6 +130,14 @@ Finally, `rle-core` also defines the following constants:
 * `NEGATIVE_INFINITY`: A special value representing the start of a coordinate.  This is not the same as `Number.NEGATIVE_INFINITY`
 * `POSITIVE_INFINITY`: A special value representing the end coordinate of the volume.  Not the same as `Number.POSITIVE_INFINITY`
 * `EPSILON`: A small floating point number.
+
+And two helper methods:
+
+### `compareCoord(a, b)`
+Compares two coordinates lexicographically
+
+### `saturateAbs(x)`
+Returns |x| clamped to [0,1]
 
 Acknowledgements
 ================

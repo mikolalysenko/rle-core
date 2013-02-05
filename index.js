@@ -2,10 +2,11 @@
 
 //General stuff
 var misc = require("./lib/misc.js");
+exports.compareCoord      = misc.compareCoord;
+exports.saturateAbs       = misc.saturateAbs;
 exports.EPSILON           = misc.EPSILON;
 exports.POSITIVE_INFINITY = misc.POSITIVE_INFINITY;
 exports.NEGATIVE_INFINITY = misc.NEGATIVE_INFINITY;
-exports.compareCoord      = misc.compareCoord;
 
 //Basic data types
 var volume = require("./lib/volume.js");
