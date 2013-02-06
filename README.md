@@ -1,7 +1,7 @@
 `rle-core`
 =========
 
-...is the central package in the `rle-*` CommonJS libraries for 3D narrow band level sets.  These tools are currently a work in progress, so expect stuff to change over time.  This package contains fundamental data structures for working with narrowband level sets. Higher order algorithms are to be built on top of these tools.
+...is the central package in the [`rle-*` CommonJS libraries](https://github.com/mikolalysenko/rle-all) for 3D narrow band level sets.  These tools are currently a work in progress, so expect stuff to change over time.  This package contains fundamental data structures for working with narrowband level sets. Higher order algorithms are to be built on top of these tools.
 
 Installation
 ============
