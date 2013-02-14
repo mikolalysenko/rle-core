@@ -45,9 +45,17 @@ Then you can use them to generate a boxy level set and convert it into a mesh:
     });
     
     var mesh = require("rle-mesh")(box);
+    
+Demos
+=====
+If you want to see some examples of what you can do with narrow band level sets, here are a few demos:
 
-API
-===
+* [Isosurface mesh extraction](http://mikolalysenko.github.com/rle-mesh/examples/simpleMultiphase/www/index.html)
+* [Game of Life in 3D](http://mikolalysenko.github.com/rle-core/life3d/index.html)
+
+
+`rle-core` API
+==============
 `rle-core` contains iterators and data structures.  There are basically two kinds of RLE volumes, StaticVolumes and DynamicVolumes.  Whichever one you pick should depend on the application you have in mind.  If your volume is short lived, and you are going to be modifying it a lot, use a DynamicVolume.  Accessing StaticVolumes is around 10% more efficient, and they use less memory since they are built on top of typed arrays.  However, constructing a StaticVolume is pretty expensive and so don't build one if you are only going to keep it around for a short time.
 
 ## `StaticVolume` and `DynamicVolume`
