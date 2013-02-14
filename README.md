@@ -1,58 +1,54 @@
 `rle-core`
 =========
+...is the central package in the [`rle` narrowband level set family of packages](https://github.com/mikolalysenko/rle-core).  These tools are currently a work in progress, so expect many changes in the coming months.  This package contains fundamental data structures for working with multiphase narrowband level sets. Higher order algorithms are to be built on top of these tools.
 
-...is the central package in the [`rle-*` CommonJS libraries](https://github.com/mikolalysenko/rle-all) for 3D narrow band level sets.  These tools are currently a work in progress, so expect stuff to change over time.  This package contains fundamental data structures for working with narrowband level sets. Higher order algorithms are to be built on top of these tools.
+Overview
+========
+A multiphase solid is an extension of the usual concept of a solid object to structures with multiple distinct material phases.  One can recover the usual definition of a solid by just taking the number of phases = 2.
 
-Installation
-============
+A narrowband level set is a sparse representation of a level set as it is sampled on a regular grid.  However, instead of storing an entire dense array of voxels, narrowband methods only store voxels which are near the boundary of the level set.  This means that their storage and processing requirements are typically O(n^2/3) of the size of a dense level set.
 
-First, install it via npm:
+The `rle-*` libraries are split into several components, which we could group coarsely into two layers
+
+Foundation
+----------
+* [`rle-core`](https://github.com/mikolalysenko/rle-core): Foundational data structures and algorithms
+* [`rle-sample`](https://github.com/mikolalysenko/rle-core): Algorithms for sampling level sets
+* [`rle-stencils`](https://github.com/mikolalysenko/rle-stencils): Commonly used stencils
+* [`rle-mesh`](https://github.com/mikolalysenko/rle-mesh): Surface extraction and meshing operations
+* [`rle-funcs`](https://github.com/mikolalysenko/rle-funcs): Generic surface processing primitives.
+* [`rle-classify`](https://github.com/mikolalysenko/rle-classify): Primitive classification and queries.
+
+Extensions
+----------
+* [`rle-components`](https://github.com/mikolalysenko/rle-components): Connected component labelling and extraction.
+* [`rle-csg`](https://github.com/mikolalysenko/rle-csg): Constructive solid geometry (aka boolean set operations)
+* [`rle-repair`](https://github.com/mikolalysenko/rle-repair): Repair and validation methods
+* [`rle-rasterize`](https://github.com/mikolalysenko/rle-rasterize): Rasterizes meshes into level sets.
+* [`rle-morphology`](https://github.com/mikolalysenko/rle-morphology): Mathematical morphology for level sets.
+
+
+Getting Started
+===============
+To install the core library, you grab it from npm:
 
     npm install rle-core
-
-Then, you can use the core library as follows:
-
-    var core = require("rle-core");
     
-    //Create a box
-    var box = core.sampleSolid([-10,-10,-10], [10,10,10], function(x) {
+By itself rle-core probably isn't enough to do anything terribly interesting.  So if you want to do something cool, you will probably want to import one of the other libraries - like [`rle-sample`](https://github.com/mikolalysenko/rle-sample), which lets you sample level sets; or [`rle-mesh`](https://github.com/mikolalysenko/rle-mesh) which lets you convert level sets into meshes.  To install those packages, just do:
+
+    npm install rle-sample rle-mesh
+    
+Then you can use them to generate a boxy level set and convert it into a mesh:
+
+    var box = require("rle-sample").solid.dense([-10, -10, -10], [10, 10, 10], function(x) {
       return Math.max(Math.abs(x[0]), Math.abs(x[1]), Math.abs(x[2]));
     });
+    
+    var mesh = require("rle-mesh")(box);
 
-Or if you want some more features, you can just pull in rle-all:
-
-    npm install rle
-
-Just the basics
-===============
-For beginners, there is most important method you need to understand in this package is the following:
-
-
-### `sampleSolid(lo, hi, dist_func)`
-This function creates a narrowband level set representation of the given solid object.
-
-* `lo` is a lower bound on the volume to sample
-* `hi` is an upper bound
-* `dist_func(x)` is a signed distance function that gives the distance to the boundary of the solid.
-
-A little more complicated
--------------------------
-`rle` can also handle objects with multiple phases.  To create one of these things, you can use the more advanced sampler:
-
-### `sample(lo, hi, phase_func[, distance_func])`
-
-* `lo`: Lower bound on the volume, represented as 3d array of ints
-* `hi`: Upper bound on the volume, 3d array of ints
-* `phase_func(x)`: A function taking a 3d array of floats as input, returning an int representing the phase of the level set at point x.
-* `distance_func(x)`: (Optional) A function that returns the distance to the phase boundary
-
-**Returns:** A dynamic narrowband level set representation of `phase_func`
-
-With this method and the tools in the other  packages, you should be able to get around pretty easily.  The rest of the details are mostly internal stuff, like iteration and allocation.  Feel free to ignore it if this is your first time using rle.
-
-The rest of the stuff
-=====================
-This package contains iterators and data structures.  There are basically two kinds of RLE volumes, StaticVolumes and DynamicVolumes.  Whichever one you pick should depend on the application you have in mind.  If your volume is short lived, and you are going to be modifying it a lot, use a DynamicVolume.  Accessing StaticVolumes is around 10% more efficient, and they use less memory since they are built on top of typed arrays.  However, constructing a StaticVolume is pretty expensive and so don't build one if you are only going to keep it around for a short time.
+API
+===
+`rle-core` contains iterators and data structures.  There are basically two kinds of RLE volumes, StaticVolumes and DynamicVolumes.  Whichever one you pick should depend on the application you have in mind.  If your volume is short lived, and you are going to be modifying it a lot, use a DynamicVolume.  Accessing StaticVolumes is around 10% more efficient, and they use less memory since they are built on top of typed arrays.  However, constructing a StaticVolume is pretty expensive and so don't build one if you are only going to keep it around for a short time.
 
 ## `StaticVolume` and `DynamicVolume`
 

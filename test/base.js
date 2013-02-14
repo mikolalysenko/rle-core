@@ -1,5 +1,6 @@
 var test  = require("tap").test
-  , rle   = require("../index.js");
+  , rle   = require("../index.js")
+  , sample = require("rle-sample");
 
 test('volume', function(t) {
 

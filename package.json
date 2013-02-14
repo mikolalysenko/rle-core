@@ -1,6 +1,6 @@
 {
   "name": "rle-core",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Core tools for working with narrow band level sets in JavaScript",
   "main": "src/index.js",
   "directories": {
@@ -13,7 +13,8 @@
   "dependencies": {
   },
   "devDependencies": {
-    "tap": "~0.3.3"
+    "tap": "~0.3.3",
+    "rle-sample": "~0.0"
   },
   "repository": {
     "type": "git",
