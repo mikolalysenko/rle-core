@@ -1,5 +1,6 @@
 var test  = require("tap").test
-  , rle   = require("../index.js");
+  , rle   = require("../index.js")
+  , sample = require("rle-sample");
 
 var sphere_func = new Function("x",
   "return 5 - Math.sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2])"
@@ -11,7 +12,7 @@ function sphere_phase(x) {
 
 test("multi_iterator", function(t) {
 
-  var sphere_vol = rle.sample([-10,-10,-10],[10,10,10], sphere_phase, sphere_func);
+  var sphere_vol = sample.dense([-10,-10,-10],[10,10,10], sphere_phase, sphere_func);
   
   //Try creating iterator
   var iter = rle.beginMulti([sphere_vol, new rle.DynamicVolume()], new Int32Array(3));
