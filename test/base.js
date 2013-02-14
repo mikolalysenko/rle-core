@@ -55,7 +55,7 @@ function sphere_phase(x) {
 }
 
 test('sample', function(t) {
-  var sphere_vol = rle.sample([-10,-10,-10], [10,10,10], sphere_phase);
+  var sphere_vol = sample.dense([-10,-10,-10], [10,10,10], sphere_phase);
   var point = [0,0,0];
   
   for(var i=0; i<sphere_vol.length(); ++i) {

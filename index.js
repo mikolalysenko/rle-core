@@ -13,10 +13,6 @@ var volume = require("./lib/volume.js");
 exports.DynamicVolume     = volume.DynamicVolume;
 exports.StaticVolume      = volume.StaticVolume;
 
-//Implicit function -> Level set conversion
-exports.sample            = require("./lib/sample.js");
-exports.sampleSolid       = require("./lib/sample_solid.js");
-
 //Iterators
 var stencil = require("./lib/stencil_iterator.js");
 exports.StencilIterator   = stencil.StencilIterator;
