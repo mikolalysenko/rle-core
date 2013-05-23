@@ -13,7 +13,7 @@ The `rle-*` libraries are split into several components, which we could group co
 Foundation
 ----------
 * [`rle-core`](https://github.com/mikolalysenko/rle-core): Foundational data structures and algorithms
-* [`rle-sample`](https://github.com/mikolalysenko/rle-core): Algorithms for sampling level sets
+* [`rle-sample`](https://github.com/mikolalysenko/rle-sample): Algorithms for sampling level sets
 * [`rle-stencils`](https://github.com/mikolalysenko/rle-stencils): Commonly used stencils
 * [`rle-mesh`](https://github.com/mikolalysenko/rle-mesh): Surface extraction and meshing operations
 * [`rle-funcs`](https://github.com/mikolalysenko/rle-funcs): Generic surface processing primitives.
