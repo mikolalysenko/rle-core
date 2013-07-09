@@ -52,7 +52,7 @@ If you want to see some examples of what you can do with narrow band level sets,
 
 * [Isosurface mesh extraction](http://mikolalysenko.github.com/rle-mesh/examples/simpleMultiphase/www/index.html)
 * [Game of Life in 3D](http://mikolalysenko.github.com/rle-core/life3d/index.html)
-
+* [Morphology Demo](http://mikolalysenko.github.com/rle-morphology/example/www/index.html)
 
 `rle-core` API
 ==============

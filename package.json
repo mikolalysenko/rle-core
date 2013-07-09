@@ -2,7 +2,7 @@
   "name": "rle-core",
   "version": "0.0.7",
   "description": "Core tools for working with narrow band level sets in JavaScript",
-  "main": "src/index.js",
+  "main": "index.js",
   "directories": {
     "test": "test",
     "lib":  "lib"
